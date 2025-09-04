@@ -18,12 +18,7 @@ connectCloudinary();
 
 // Middlewares
 app.use(express.json());
-app.use(
-    cors({
-        origin: 'https://kukzsportswear.com',
-        credentials: true,
-    })
-);
+app.use(cors());
 
 //  Webhook
 app.use('/api/webhook', webhookRouter);
