@@ -56,35 +56,42 @@ const PlaceOrder = () => {
             };
 
             switch (method) {
-                // API call for COD Payment
                 case 'COD':
                     const response = await axios.post(backendUrl + '/api/order/place', orderData, {
-                        headers: { token },
+                        headers: { Authorization: `Bearer ${token}` },
                     });
+
                     if (response.data.success) {
-                        // Clear cart then redirect to orders page
+                        // Clear cart locally and on backend
                         setCartItems({});
                         localStorage.removeItem('cartItems');
+                        await axios.post(
+                            `${backendUrl}/api/cart/clear`,
+                            {},
+                            { headers: { Authorization: `Bearer ${token}` } }
+                        );
 
-                        // Toast notification
                         toast.success(response.data.message);
-
-                        // Redirect to orders page with refresh
                         navigate('/orders', { state: { refresh: true } });
                     } else {
                         toast.error(response.data.message);
                     }
                     break;
 
-                // API call for GCash Payment
                 case 'Gcash':
-                    const res = await axios.post(backendUrl + '/api/order/gcash', orderData, {
-                        headers: { token },
+                    const res = await axios.post(`${backendUrl}/api/order/gcash`, orderData, {
+                        headers: { Authorization: `Bearer ${token}` },
                     });
 
                     if (res.data.success && res.data.checkoutUrl) {
-                        // Clear cart then redirect to Gcash checkout
+                        // Persist token before redirecting
+                        localStorage.setItem('token', token);
+
+                        // Clear cart locally
                         setCartItems({});
+                        localStorage.removeItem('cartItems');
+
+                        // Redirect to GCash checkout
                         window.location.href = res.data.checkoutUrl;
                     } else {
                         toast.error(res.data.message || 'GCash checkout failed');

@@ -22,12 +22,31 @@ const Verify = () => {
                     return;
                 }
 
+                // Retrieve token from localStorage
+                const savedToken = localStorage.getItem('token');
+                if (!savedToken) {
+                    setStatus('No token found. Please login again.');
+                    setLoading(false);
+                    return;
+                }
+
                 // Call backend to verify payment
-                const { data } = await axios.post(`${backendUrl}/api/order/verify`, {
-                    payment_intent_id: intentId,
-                });
+                const { data } = await axios.post(
+                    `${backendUrl}/api/order/verify`,
+                    { payment_intent_id: intentId },
+                    { headers: { Authorization: `Bearer ${savedToken}` } }
+                );
 
                 if (data.success && data.paid) {
+                    setStatus('Payment Successful! Clearing cart...');
+
+                    // Clear cart on backend
+                    await axios.post(
+                        `${backendUrl}/api/cart/clear`,
+                        {},
+                        { headers: { Authorization: `Bearer ${savedToken}` } }
+                    );
+
                     // Clear cart locally
                     setCartItems({});
                     localStorage.removeItem('cartItems');
