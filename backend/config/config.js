@@ -1,0 +1,11 @@
+export const mongoURI = process.env.MONGODB_URI;
+export const cloudinaryApiKey = process.env.CLOUDINARY_API_KEY;
+export const cloudinarySecret = process.env.CLOUDINARY_SECRET_KEY;
+export const cloudinaryName = process.env.CLOUDINARY_NAME;
+export const jwtSecret = process.env.JWT_SECRET;
+export const adminEmail = process.env.ADMIN_EMAIL;
+export const adminPassword = process.env.ADMIN_PASSWORD;
+export const paymongoKey = process.env.PAYMONGO_SECRET_KEY;
+export const xenditKey = process.env.XENDIT_SECRET_KEY;
+export const frontendURL = process.env.FRONTEND_URL;
+export const webhookSecret = process.env.WEBHOOK_SECRET;

@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
-import productModel from '../models/productmodel.js';
+import productModel from '../models/productModel.js';
 
 // Function for add product
 const addProduct = async (req, res) => {
