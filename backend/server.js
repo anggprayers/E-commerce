@@ -20,7 +20,7 @@ connectCloudinary();
 app.use(express.json());
 app.use(
     cors({
-        origin: 'https://kukzsportswear.com',
+        origin: ['https://kukzsportswear.com', 'https://admin.kukzsportswear.com'],
         credentials: true,
     })
 );
