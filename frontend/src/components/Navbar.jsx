@@ -24,7 +24,7 @@ const Navbar = () => {
                 <img src={assets.logo1} className='w-15' alt='Kukz Logo' />
             </Link>
 
-            <ul className='hidden sm:flex gap-5 text-sm text-gray-700'>
+            <ul className='hidden sm:flex gap-5 text-sm text-white font-bold'>
                 <NavLink to='/' className='flex flex-col items-center gap-1'>
                     <p>HOME</p>
                     <hr className='w-2/4 border-none h-[1.5px] bg-gradient-to-r from-red-500 to-black hidden ' />
@@ -79,11 +79,11 @@ const Navbar = () => {
                 <Link to='/cart' className='relative'>
                     <img
                         src={assets.cart_icon}
-                        className={`w-6 h-6 object-contain ${cartCount === 0 ? 'opacity-50' : ''}`}
-                        alt=''
+                        className={`w-7 h-7 object-contain ${cartCount === 0 ? 'opacity-50' : ''}`}
+                        alt='Shopping Cart'
                     />
                     {cartCount > 0 && (
-                        <p className='absolute right-[-4px] bottom-[-4px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]'>
+                        <p className='absolute right-[-4px] bottom-[-4px] w-4 text-center leading-4 bg-red-500 text-white font-bold aspect-square rounded-full text-[8px]'>
                             {cartCount}
                         </p>
                     )}

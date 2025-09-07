@@ -12,12 +12,12 @@ const Contact = () => {
             <div className='my-10 flex flex-col justify-center md:flex-row gap-10 mb-28'>
                 <img className='w-full md:max-w-[480px] ' src={assets.contact_img} alt='' />
                 <div className='flex flex-col justify-center items-start gap-6'>
-                    <p className='font-semibold text-xl text-gray-600'>Our Store</p>
-                    <p className='text-gray-500'>
+                    <p className='font-semibold text-xl text-white'>Our Store</p>
+                    <p className='text-white/80'>
                         Merville Park Subdivision <br /> 3 Barcelona, Parañaque
                         <br /> 1709 Metro Manila
                     </p>
-                    <p className='text-gray-500'>
+                    <p className='text-white/80'>
                         Tel: +63 961 642-7818 <br /> Email: kukzsportswear@gmail.com
                     </p>
                     <p></p>
@@ -25,16 +25,14 @@ const Contact = () => {
                 </div>
             </div>
             {/* Contact Form Only */}
-            <div className='flex justify-center mb-28'>
+            <div className='flex justify-center mb-28 text-white'>
                 <form
                     action='https://api.web3forms.com/submit'
                     method='POST'
                     className='flex flex-col w-full md:w-1/2 gap-4 p-6'
                 >
                     <div className='mb-4'>
-                        <h2 className='text-2xl font-bold text-gray-700 text-center'>
-                            Get in touch
-                        </h2>
+                        <h2 className='text-2xl font-bold text-white text-center'>Get in touch</h2>
                         <hr className='border-t-2 border-red-500 mt-2 w-20 mx-auto' />
                     </div>
 
@@ -48,7 +46,7 @@ const Contact = () => {
                         type='text'
                         name='name'
                         placeholder='Your Name'
-                        className='p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none'
+                        className='p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none placeholder-gray-500'
                         required
                     />
                     <input
@@ -57,7 +55,7 @@ const Contact = () => {
                         placeholder='+639XXXXXXXXX'
                         pattern='^\+639\d{9}$'
                         maxLength='13'
-                        className='p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none'
+                        className='p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none placeholder-gray-500'
                         required
                         onInput={(e) => {
                             let value = e.target.value;
@@ -82,14 +80,14 @@ const Contact = () => {
                         type='email'
                         name='email'
                         placeholder='Your Email'
-                        className='p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none'
+                        className='p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none placeholder-gray-500'
                         required
                     />
                     <textarea
                         name='message'
                         placeholder='Your Message'
                         rows='5'
-                        className='p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none'
+                        className='p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none placeholder-gray-500'
                         required
                     ></textarea>
 
@@ -97,7 +95,7 @@ const Contact = () => {
                     <div className='flex justify-center'>
                         <button
                             type='submit'
-                            className='flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-red-600 font-bold w-32'
+                            className='flex items-center justify-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-red-600 font-bold w-32'
                         >
                             Submit
                         </button>

@@ -8,12 +8,12 @@ import p_img7 from './p_img7.jpg';
 import p_img8 from './p_img8.jpg';
 import p_img9 from './p_img9.jpg';
 import p_img10 from './p_img10.jpg';
-import logo1 from './kukz_logo.png';
-import search_icon from './search-icon.png';
-import profile_icon from './profile_icon.png';
+import logo1 from './kukz_logo_white.png';
+import search_icon from './search_icon.png';
+import profile_icon from './user_icon.png';
 import cart_icon from './cart_icon.png';
 import menu_icon from './menu_icon.png';
-import exchange_icon from './exchange.png';
+import exchange_icon from './exchange_icon.png';
 import quality_icon from './quality.png';
 import support_icon from './customer-support.png';
 import dropdown_icon from './dropdown_icon.png';
@@ -21,12 +21,13 @@ import arrow_right from './right-arrow-angle.png';
 import close_icon from './close.png';
 import star_icon from './star.png';
 import star_dull from './star-dull.png';
-import bin_icon from './recycle-bin.png';
+import bin_icon from './bin.png';
 import hero from './hero1.jpg';
 import hero1 from './hero2.jpg';
 import gcash_icon from './Gcash_logo.png';
 import about_img from './about.png';
 import contact_img from './contact.jfif';
+import logo_white from './logo-white.png';
 
 export const assets = {
     p_img1,
@@ -49,6 +50,7 @@ export const assets = {
     gcash_icon,
     about_img,
     contact_img,
+    logo_white,
 };
 
 export const products = [

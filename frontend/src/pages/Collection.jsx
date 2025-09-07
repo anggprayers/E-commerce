@@ -69,7 +69,7 @@ const Collection = () => {
     return (
         <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t'>
             {/* Filter Options */}
-            <div className='min-w-60'>
+            <div className='min-w-60 text-white'>
                 <p
                     onClick={() => setShowFilter(!showFilter)}
                     className='my-2 text-xl flex items-center cursor-pointer gap-2'
@@ -90,11 +90,11 @@ const Collection = () => {
                     } sm:block`}
                 >
                     <p className='mb-3 text-sm font-medium'>CATEGORIES</p>
-                    <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
+                    <div className='flex flex-col gap-2 text-sm font-light text-white'>
                         <p className='flex gap-2'>
                             <input
                                 type='checkbox'
-                                className='w-3'
+                                className='w-3 accent-red-500'
                                 value={'Men'}
                                 onChange={toggleCategory}
                             />{' '}
@@ -103,7 +103,7 @@ const Collection = () => {
                         <p className='flex gap-2'>
                             <input
                                 type='checkbox'
-                                className='w-3'
+                                className='w-3 accent-pink-500'
                                 value={'Women'}
                                 onChange={toggleCategory}
                             />{' '}
@@ -112,7 +112,7 @@ const Collection = () => {
                         <p className='flex gap-2'>
                             <input
                                 type='checkbox'
-                                className='w-3'
+                                className='w-3 accent-blue-500'
                                 value={'Kids'}
                                 onChange={toggleCategory}
                             />{' '}
@@ -127,11 +127,11 @@ const Collection = () => {
                     } sm:block`}
                 >
                     <p className='mb-3 text-sm font-medium'>TYPE</p>
-                    <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
+                    <div className='flex flex-col gap-2 text-sm font-light text-white'>
                         <p className='flex gap-2'>
                             <input
                                 type='checkbox'
-                                className='w-3'
+                                className='w-3 accent-gray-500'
                                 value={'Topwear'}
                                 onChange={toggleSubCategory}
                             />{' '}
@@ -140,7 +140,7 @@ const Collection = () => {
                         <p className='flex gap-2'>
                             <input
                                 type='checkbox'
-                                className='w-3'
+                                className='w-3 accent-gray-500'
                                 value={'Bottomwear'}
                                 onChange={toggleSubCategory}
                             />{' '}
@@ -149,7 +149,7 @@ const Collection = () => {
                         <p className='flex gap-2'>
                             <input
                                 type='checkbox'
-                                className='w-3'
+                                className='w-3 accent-gray-500'
                                 value={'Winterwear'}
                                 onChange={toggleSubCategory}
                             />
@@ -165,11 +165,17 @@ const Collection = () => {
                     {/* Product Sorting */}
                     <select
                         onChange={(e) => setSortType(e.target.value)}
-                        className='border-2 border-gray-300 text-sm px-2'
+                        className='border-2 border-gray-300 text-sm px-2 bg-transparent text-white'
                     >
-                        <option value='relevant'>Sort by: Relevant </option>
-                        <option value='low-high'>Sort by: Low to High</option>
-                        <option value='high-low'>Sort by: High to Low</option>
+                        <option className='text-black' value='relevant'>
+                            Sort by: Relevant{' '}
+                        </option>
+                        <option className='text-black' value='low-high'>
+                            Sort by: Low to High
+                        </option>
+                        <option className='text-black' value='high-low'>
+                            Sort by: High to Low
+                        </option>
                     </select>
                 </div>
                 {/* Products Mapping */}

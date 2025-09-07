@@ -8,8 +8,8 @@ const ProductItem = ({ id, image, name, price }) => {
         <Link className='text-gray-700 cursor-pointer' to={`/product/${id}`}>
             <div className='overflow-hidden'>
                 <img className='hover:scale-110 transition ease-in-out' src={image[0]} alt='' />
-                <p className='pt-3 pb-1 text-sm'>{name}</p>
-                <p className='text-sm font-medium'>
+                <p className='pt-3 pb-1 text-sm text-white'>{name}</p>
+                <p className='text-sm font-medium text-white/80'>
                     {currency} {price.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
                 </p>
             </div>

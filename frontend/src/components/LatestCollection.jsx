@@ -15,10 +15,10 @@ const LatestCollection = () => {
         <div className='my-10'>
             <div className='text-center py-8 text-3xl'>
                 <Title text1={'LATEST'} text2={'COLLECTIONS'} />
-                <p className='w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600'>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-                    nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                <p className='w-3/4 m-auto text-xs sm:text-sm md:text-base text-white/80'>
+                    Explore the newest Kukz Sportswear arrivals — designed with innovation, comfort,
+                    and performance in mind. From customized styles to sustainable activewear, our
+                    latest drops keep every athlete ready on and off the game.
                 </p>
             </div>
             {/* Rendering Products */}
