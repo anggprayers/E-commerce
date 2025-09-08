@@ -46,7 +46,7 @@ const Product = () => {
                     </div>
                 </div>
                 {/* -------------- Product Details -------------- */}
-                <div className='flex-1'>
+                <div className='flex-1 text-white'>
                     <h1 className='font-medium text-2xl mt-2'>{productData.name}</h1>
                     <div className='flex items-center gap-1 mt-2'>
                         <img src={assets.star_icon} alt='' className='w-3 5' />
@@ -54,21 +54,21 @@ const Product = () => {
                         <img src={assets.star_icon} alt='' className='w-3 5' />
                         <img src={assets.star_icon} alt='' className='w-3 5' />
                         <img src={assets.star_dull} alt='' className='w-3 5' />
-                        <p className='pl-2'>(122)</p>
+                        <p className='pl-2'></p>
                     </div>
                     <p className='mt-5 text-3xl font-medium'>
                         {currency}{' '}
                         {productData.price.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
                     </p>
-                    <p className='mt-5 text-gray-500 md:w-4/5'>{productData.description}</p>
+                    <p className='mt-5 text-white/80 md:w-4/5'>{productData.description}</p>
                     <div className='flex flex-col gap-4 my-8'>
                         <p>Select Size</p>
                         <div className='flex gap-2'>
                             {productData.sizes.map((item, index) => (
                                 <button
                                     onClick={() => setSize(item)}
-                                    className={`border py-2 px-4 bg-gray-100 cursor-pointer hover:bg-gray-200 transition ${
-                                        item === size ? 'border-red-500' : ''
+                                    className={`border border-black py-2 px-4 bg-red-500 cursor-pointer hover:bg-red-400 transition ${
+                                        item === size ? 'border-white' : ''
                                     }`}
                                     key={index}
                                 >
@@ -79,12 +79,12 @@ const Product = () => {
                     </div>
                     <button
                         onClick={() => addToCart(productData._id, size)}
-                        className='bg-black text-white px-8 py-3 text-sm active:bg-red-700'
+                        className='bg-white text-black px-8 py-3 text-sm border border-black font-bold hover:bg-gray-100 active:bg-red-500 active:text-white transition'
                     >
                         ADD TO CART
                     </button>
                     <hr className='mt-8 sm:w-4/5' />
-                    <div className='text-sm text-gray-500 mt-5 flex flex-col gap-1'>
+                    <div className='text-sm text-white/80 mt-5 flex flex-col gap-1'>
                         <p>100% Original product.</p>
                         <p>Cash on delivery is available on this product.</p>
                         <p>Easy return and exchange policy within 7 days.</p>
@@ -93,20 +93,12 @@ const Product = () => {
             </div>
             {/* ------------- Product Description & Reviews -------------- */}
             <div className='mt-20'>
-                <div className='flex'>
+                <div className='flex text-white'>
                     <b className='border px-5 py-3 text-sm'>Description</b>
-                    <p className='border px-5 py-3 text-sm'>Reviews (122)</p>
+                    {/* <p className='border px-5 py-3 text-sm'>Reviews (122)</p> */}
                 </div>
-                <div className='flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500'>
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                        tempor incididunt ut labore et dolore magna aliqua.
-                    </p>
-                    <p>
-                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                        aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                        voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                    </p>
+                <div className='flex flex-col gap-4 border px-6 py-6 text-sm text-white/80'>
+                    <p>{productData.description}</p>
                 </div>
             </div>
             {/* ------------- Related Products -------------- */}
