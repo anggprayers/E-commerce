@@ -5,6 +5,7 @@ import { ShopContext } from "../context/ShopContext";
 
 const Navbar = () => {
     const [visible, setVisible] = useState(false);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
     const { setShowSearch, getCartCount, navigate, token, setToken, setCartItems } = useContext(ShopContext);
 
     const logout = () => {
@@ -13,6 +14,7 @@ const Navbar = () => {
         localStorage.removeItem("cartItems"); // reset cart from localStorage
         setToken(""); // reset token
         setCartItems({}); // reset cart items
+        setShowProfileMenu(false);
     };
 
     const cartCount = getCartCount();
@@ -50,7 +52,7 @@ const Navbar = () => {
                     alt="Search"
                 />
 
-                <div className="group relative">
+                <div className="group relative z-40">
                     <img
                         onClick={() => (token ? null : navigate("/login"))}
                         src={assets.profile_icon}
@@ -61,8 +63,21 @@ const Navbar = () => {
                     {token && (
                         <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
                             <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
-                                <p className="cursor-pointer hover:text-black">My Profile</p>
-                                <p onClick={() => navigate("/orders")} className="cursor-pointer hover:text-black">
+                                <p
+                                    onClick={() => {
+                                        setShowProfileMenu(false);
+                                    }}
+                                    className="cursor-pointer hover:text-black"
+                                >
+                                    My Profile
+                                </p>
+                                <p
+                                    onClick={() => {
+                                        setShowProfileMenu(false);
+                                        navigate("/orders");
+                                    }}
+                                    className="cursor-pointer hover:text-black"
+                                >
                                     Orders
                                 </p>
                                 <p onClick={logout} className="cursor-pointer hover:text-black">
@@ -84,6 +99,7 @@ const Navbar = () => {
                         </p>
                     )}
                 </Link>
+                {/* Mobile Menu Button */}
                 <img
                     onClick={() => setVisible(true)}
                     src={assets.menu_icon}
@@ -93,11 +109,11 @@ const Navbar = () => {
             </div>
             {/* Sidebar menu for small screens */}
             <div
-                className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${
+                className={`absolute top-0 right-0 bottom-0 overflow-hidden bg-black transition-all z-50 ${
                     visible ? "w-full" : "w-0"
                 }`}
             >
-                <div className="flex flex-col text-gray-600">
+                <div className="flex flex-col text-white">
                     <div onClick={() => setVisible(false)} className="flex items-center gap-1 p-3">
                         <img src={assets.dropdown_icon} className="h-4 rotate-90 cursor-pointer" alt="" />
                         <p>Back</p>

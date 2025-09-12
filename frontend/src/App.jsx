@@ -15,6 +15,13 @@ import SearchBar from "./components/SearchBar";
 import { ToastContainer, toast } from "react-toastify";
 import Verify from "./pages/Verify";
 import ScrollToTop from "./components/ScrollToTop";
+import Billiards from "./pages/Billiards";
+import Basketball from "./pages/Basketball";
+import Volleyball from "./pages/Volleyball";
+import Activewear from "./pages/Activewear";
+import Football from "./pages/Football";
+import Soccer from "./pages/Soccer";
+import Corporate from "./pages/Corporate";
 
 const App = () => {
     return (
@@ -35,6 +42,13 @@ const App = () => {
                 <Route path="/place-order" element={<PlaceOrder />} />
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/verify" element={<Verify />} />
+                <Route path="/billiards" element={<Billiards />} />
+                <Route path="/mens-basketball" element={<Basketball />} />
+                <Route path="/volleyball" element={<Volleyball />} />
+                <Route path="/activewear" element={<Activewear />} />
+                <Route path="/football" element={<Football />} />
+                <Route path="/soccer" element={<Soccer />} />
+                <Route path="/corporate" element={<Corporate />} />
             </Routes>
             <Footer />
         </div>

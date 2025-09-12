@@ -6,8 +6,8 @@ import { assets } from "../assets/assets";
 const Slider = () => {
     const sliderImages = [
         { src: assets.slider_video, type: "video", title: "Beat The Odds" },
-        { src: assets.slider_video2, type: "video", title: "Terrafirma on Fire" },
-        { src: assets.slider_image1, type: "image", title: "Wear the Will to Win" },
+        { src: assets.slider_video2, type: "video", title: "Beat The Odds" },
+        { src: assets.slider_image1, type: "image", title: "Beat The Odds" },
     ];
 
     const videoRef = useRef(null);
@@ -44,7 +44,7 @@ const Slider = () => {
     const currentTitle = sliderImages[currentIndex].title;
 
     return (
-        <div className="relative -mx-4 sm:-mx-[5vw] md:-mx-[7vw] lg:-mx-[9vw] h-[880px] pb-20 group">
+        <div className="relative -mx-3 sm:-mx-[4vw] md:-mx-[6vw] lg:-mx-[8vw] pb-20 group">
             {isVideo ? (
                 <video
                     ref={videoRef}
@@ -52,20 +52,20 @@ const Slider = () => {
                     autoPlay
                     loop
                     muted
-                    className="w-full h-[400px] sm:h-[500px] md:h-[650px] lg:h-[780px] object-cover"
+                    className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
                 />
             ) : (
                 <img
                     src={sliderImages[currentIndex].src}
                     alt="slide"
-                    className="w-full h-[400px] sm:h-[500px] md:h-[650px] lg:h-[780px] object-cover"
+                    className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
                 />
             )}
 
             {/* Left Arrow */}
             <div
                 onClick={prevSlide}
-                className="hidden group-hover:block absolute top-1/4 sm:top-1/2 md:top-1/2 lg:top-1/2 left-4 md:left-8 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
+                className="hidden group-hover:block absolute top-1/3 left-4 md:left-8 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
             >
                 <BsChevronCompactLeft size={25} md={35} />
             </div>
@@ -73,7 +73,7 @@ const Slider = () => {
             {/* Right Arrow */}
             <div
                 onClick={nextSlide}
-                className="hidden group-hover:block absolute top-1/4 sm:top-1/2 md:top-1/2 lg:top-1/2 right-4 md:right-8 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
+                className="hidden group-hover:block absolute top-1/3 right-4 md:right-8 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
             >
                 <BsChevronCompactRight size={25} md={35} />
             </div>
@@ -82,7 +82,7 @@ const Slider = () => {
             {isVideo && (
                 <div
                     onClick={togglePlay}
-                    className="hidden group-hover:block absolute top-1/4 sm:top-1/2 md:top-1/2 lg:top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
+                    className="hidden group-hover:block absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
                 >
                     {isPlaying ? <BsPauseFill size={25} md={35} /> : <BsPlayFill size={25} md={35} />}
                 </div>
@@ -104,7 +104,7 @@ const Slider = () => {
                 </div>
 
                 {/* Overlay Text below dots */}
-                <h2 className="mt-2 text-red-700 text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase font-bold drop-shadow-lg text-center">
+                <h2 className="mt-1.5 text-red-600 text-xl sm:text-2xl md:text-3xl lg:text-4xl uppercase font-bold text-center">
                     {currentTitle}
                 </h2>
             </div>
