@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
-import { assets } from "../assets/assets";
 import RelatedProducts from "../components/RelatedProducts";
+import SizingChart from "./SizingChart";
 
 const Product = () => {
     const { productId } = useParams();
@@ -10,6 +10,9 @@ const Product = () => {
     const [productData, setProductData] = useState(false);
     const [image, setImage] = useState("");
     const [size, setSize] = useState("");
+    const [frontName, setFrontName] = useState("");
+    const [backName, setBackName] = useState("");
+    const [jerseyNumber, setJerseyNumber] = useState("");
 
     const fetchProductData = () => {
         const found = products.find((item) => item._id === productId);
@@ -48,36 +51,74 @@ const Product = () => {
                 {/* -------------- Product Details -------------- */}
                 <div className="flex-1 text-white">
                     <h1 className="font-medium text-2xl mt-2">{productData.name}</h1>
-                    <div className="flex items-center gap-1 mt-2">
-                        <img src={assets.star_icon} alt="" className="w-3 5" />
-                        <img src={assets.star_icon} alt="" className="w-3 5" />
-                        <img src={assets.star_icon} alt="" className="w-3 5" />
-                        <img src={assets.star_icon} alt="" className="w-3 5" />
-                        <img src={assets.star_dull} alt="" className="w-3 5" />
-                        <p className="pl-2"></p>
-                    </div>
+                    <SizingChart category={productData.category} gender={productData.subCategory} />
                     <p className="mt-5 text-3xl font-medium">
                         {currency} {productData.price.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
                     </p>
                     <p className="mt-5 text-white/80 md:w-4/5">{productData.description}</p>
                     <div className="flex flex-col gap-4 my-8">
                         <p>Select Size</p>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2 sm:gap-3">
                             {productData.sizes.map((item, index) => (
                                 <button
                                     onClick={() => setSize(item)}
-                                    className={`border border-black py-2 px-4 bg-red-500 cursor-pointer hover:bg-red-400 transition ${
-                                        item === size ? "border-white" : ""
-                                    }`}
                                     key={index}
+                                    className={`min-w-[60px] sm:min-w-[70px] py-2 px-4 rounded-md border border-black bg-red-500 cursor-pointer 
+          hover:bg-red-400 transition text-sm sm:text-base 
+          ${item === size ? "border-white" : ""}`}
                                 >
                                     {item}
                                 </button>
                             ))}
                         </div>
                     </div>
+
+                    {/* Printed Names & Number */}
+                    <div className="flex flex-col gap-4 my-6">
+                        <div>
+                            <label className="block mb-1 text-sm">PRINTED NAME ON FRONT CHEST (Optional)</label>
+                            <input
+                                type="text"
+                                maxLength={12}
+                                value={frontName}
+                                onChange={(e) => setFrontName(e.target.value)}
+                                placeholder="Max 12 characters entry"
+                                className="w-full max-w-[90%] sm:max-w-[400px] lg:max-w-[490px] p-2 border border-gray-400 rounded text-white"
+                            />
+                            <p className="text-xs text-gray-400 mt-1">{frontName.length}/12</p>
+                        </div>
+
+                        <div>
+                            <label className="block mb-1 text-sm">PRINTED NAME ON UPPER BACK (Optional)</label>
+                            <input
+                                type="text"
+                                maxLength={25}
+                                value={backName}
+                                onChange={(e) => setBackName(e.target.value)}
+                                placeholder="Max 25 characters entry"
+                                className="w-full max-w-[90%] sm:max-w-[400px] lg:max-w-[490px] p-2 border border-gray-400 rounded text-white"
+                            />
+                            <p className="text-xs text-gray-400 mt-1">{backName.length}/25</p>
+                        </div>
+
+                        <div>
+                            <label className="block mb-1 text-sm">JERSEY NUMBER (Optional)</label>
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]"
+                                maxLength={4}
+                                value={jerseyNumber}
+                                onChange={(e) => setJerseyNumber(e.target.value)}
+                                placeholder="Max 4 characters entry"
+                                className="w-full max-w-[90%] sm:max-w-[400px] lg:max-w-[490px] p-2 border border-gray-400 rounded text-white"
+                            />
+                            <p className="text-xs text-gray-400 mt-1">{jerseyNumber.length}/04</p>
+                        </div>
+                    </div>
+
                     <button
-                        onClick={() => addToCart(productData._id, size)}
+                        onClick={() => addToCart(productData._id, size, frontName, backName, jerseyNumber)}
                         className="bg-white text-black px-8 py-3 text-sm border border-black font-bold hover:bg-red-400 active:bg-red-700 active:text-white transition"
                     >
                         ADD TO CART

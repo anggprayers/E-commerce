@@ -1,7 +1,12 @@
-import React, { useRef, useState } from "react";
-import { BsChevronCompactLeft, BsChevronCompactRight, BsPlayFill, BsPauseFill } from "react-icons/bs";
+import React, { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { RxDotFilled } from "react-icons/rx";
 import { assets } from "../assets/assets";
+
+// Lazy load only when needed
+const BsChevronCompactLeft = lazy(() => import("react-icons/bs").then((m) => ({ default: m.BsChevronCompactLeft })));
+const BsChevronCompactRight = lazy(() => import("react-icons/bs").then((m) => ({ default: m.BsChevronCompactRight })));
+const BsPlayFill = lazy(() => import("react-icons/bs").then((m) => ({ default: m.BsPlayFill })));
+const BsPauseFill = lazy(() => import("react-icons/bs").then((m) => ({ default: m.BsPauseFill })));
 
 const Slider = () => {
     const sliderImages = [
@@ -13,17 +18,25 @@ const Slider = () => {
     const videoRef = useRef(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
+    const [isHovered, setIsHovered] = useState(false);
+
+    useEffect(() => {
+        if (!videoRef.current) return;
+        if (isHovered) {
+            videoRef.current.pause();
+        } else if (isPlaying) {
+            videoRef.current.play();
+        }
+    }, [isHovered, isPlaying, currentIndex]);
 
     const prevSlide = () => {
-        const isFirstSlide = currentIndex === 0;
-        setCurrentIndex(isFirstSlide ? sliderImages.length - 1 : currentIndex - 1);
-        setIsPlaying(true); // reset play for video
+        setCurrentIndex((prev) => (prev === 0 ? sliderImages.length - 1 : prev - 1));
+        setIsPlaying(true);
     };
 
     const nextSlide = () => {
-        const isLastSlide = currentIndex === sliderImages.length - 1;
-        setCurrentIndex(isLastSlide ? 0 : currentIndex + 1);
-        setIsPlaying(true); // reset play for video
+        setCurrentIndex((prev) => (prev === sliderImages.length - 1 ? 0 : prev + 1));
+        setIsPlaying(true);
     };
 
     const togglePlay = () => {
@@ -36,56 +49,78 @@ const Slider = () => {
         setIsPlaying(!isPlaying);
     };
 
-    const goToSlide = (slideIndex) => {
-        setCurrentIndex(slideIndex);
+    const goToSlide = (index) => {
+        setCurrentIndex(index);
+        setIsPlaying(true);
     };
 
     const isVideo = sliderImages[currentIndex].type === "video";
     const currentTitle = sliderImages[currentIndex].title;
 
+    const LazyVideo = ({ src, videoRef }) => (
+        <video
+            ref={videoRef}
+            src={src}
+            autoPlay
+            loop
+            muted
+            className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
+        />
+    );
+
+    const LazyImage = ({ src }) => (
+        <img
+            src={src}
+            alt="slide"
+            loading="lazy"
+            className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
+        />
+    );
+
     return (
-        <div className="relative -mx-3 sm:-mx-[4vw] md:-mx-[6vw] lg:-mx-[8vw] pb-20 group">
-            {isVideo ? (
-                <video
-                    ref={videoRef}
-                    src={sliderImages[currentIndex].src}
-                    autoPlay
-                    loop
-                    muted
-                    className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
-                />
-            ) : (
-                <img
-                    src={sliderImages[currentIndex].src}
-                    alt="slide"
-                    className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
-                />
-            )}
+        <div
+            className="relative -mx-3 sm:-mx-[4vw] md:-mx-[6vw] lg:-mx-[8vw] pb-20 group"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            <Suspense fallback={<div className="w-full h-[300px] bg-gray-900 animate-pulse" />}>
+                {isVideo ? (
+                    <LazyVideo src={sliderImages[currentIndex].src} videoRef={videoRef} />
+                ) : (
+                    <LazyImage src={sliderImages[currentIndex].src} />
+                )}
+            </Suspense>
 
             {/* Left Arrow */}
-            <div
-                onClick={prevSlide}
-                className="hidden group-hover:block absolute top-1/3 left-4 md:left-8 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
-            >
-                <BsChevronCompactLeft size={25} md={35} />
-            </div>
+            <Suspense fallback={null}>
+                <div
+                    onClick={prevSlide}
+                    className="hidden group-hover:block absolute top-1/3 left-4 md:left-8 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
+                >
+                    <BsChevronCompactLeft size={25} md={35} />
+                </div>
+            </Suspense>
 
             {/* Right Arrow */}
-            <div
-                onClick={nextSlide}
-                className="hidden group-hover:block absolute top-1/3 right-4 md:right-8 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
-            >
-                <BsChevronCompactRight size={25} md={35} />
-            </div>
+            <Suspense fallback={null}>
+                <div
+                    onClick={nextSlide}
+                    className="hidden group-hover:block absolute top-1/3 right-4 md:right-8 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
+                >
+                    <BsChevronCompactRight size={25} md={35} />
+                </div>
+            </Suspense>
 
             {/* Play/Pause Button */}
             {isVideo && (
-                <div
-                    onClick={togglePlay}
-                    className="hidden group-hover:block absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
-                >
-                    {isPlaying ? <BsPauseFill size={25} md={35} /> : <BsPlayFill size={25} md={35} />}
-                </div>
+                <Suspense fallback={null}>
+                    <div
+                        onClick={togglePlay}
+                        className="hidden group-hover:block absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-2xl md:text-3xl rounded-full p-2 md:p-3 bg-black/30 cursor-pointer"
+                    >
+                        {isPlaying ? <BsPauseFill size={25} md={35} /> : <BsPlayFill size={25} md={35} />}
+                    </div>
+                </Suspense>
             )}
 
             {/* Dots + Overlay Text */}
@@ -103,7 +138,7 @@ const Slider = () => {
                     ))}
                 </div>
 
-                {/* Overlay Text below dots */}
+                {/* Overlay Text */}
                 <h2 className="mt-1.5 text-red-600 text-xl sm:text-2xl md:text-3xl lg:text-4xl uppercase font-bold text-center">
                     {currentTitle}
                 </h2>

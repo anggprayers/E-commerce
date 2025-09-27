@@ -1,15 +1,15 @@
-import orderModel from '../models/orderModel.js';
-import userModel from '../models/userModel.js';
-import axios from 'axios';
+import orderModel from "../models/orderModel.js";
+import userModel from "../models/userModel.js";
+import axios from "axios";
 
-const origin = process.env.FRONTEND_URL || 'http://localhost:5173';
+const origin = process.env.FRONTEND_URL || "http://localhost:5173";
 
 // Paymongo request with auth header
 const paymongo = axios.create({
-    baseURL: 'https://api.paymongo.com/v1',
+    baseURL: "https://api.paymongo.com/v1",
     headers: {
-        Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY).toString('base64')}`,
-        'Content-Type': 'application/json',
+        Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY).toString("base64")}`,
+        "Content-Type": "application/json",
     },
 });
 
@@ -23,7 +23,7 @@ const placeOrder = async (req, res) => {
             items,
             address,
             amount,
-            paymentMethod: 'COD',
+            paymentMethod: "COD",
             payment: false,
             date: Date.now(),
         };
@@ -33,7 +33,7 @@ const placeOrder = async (req, res) => {
 
         await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
-        res.json({ success: true, message: 'Order Placed Successfully' });
+        res.json({ success: true, message: "Order Placed Successfully" });
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: error.message });
@@ -46,17 +46,17 @@ const placeOrderGcash = async (req, res) => {
         const { userId, items, amount, address } = req.body;
 
         let formattedPhone = address.phone;
-        if (formattedPhone.startsWith('0')) {
-            formattedPhone = '+63' + formattedPhone.substring(1);
+        if (formattedPhone.startsWith("0")) {
+            formattedPhone = "+63" + formattedPhone.substring(1);
         }
 
         // 1. Create Payment Intent
-        const intentRes = await paymongo.post('/payment_intents', {
+        const intentRes = await paymongo.post("/payment_intents", {
             data: {
                 attributes: {
                     amount: amount * 100, // centavos
-                    payment_method_allowed: ['gcash'],
-                    currency: 'PHP',
+                    payment_method_allowed: ["gcash"],
+                    currency: "PHP",
                 },
             },
         });
@@ -66,10 +66,10 @@ const placeOrderGcash = async (req, res) => {
         const intentId = intent.id;
 
         // 2. Create Payment Method (GCash)
-        const pmRes = await paymongo.post('/payment_methods', {
+        const pmRes = await paymongo.post("/payment_methods", {
             data: {
                 attributes: {
-                    type: 'gcash',
+                    type: "gcash",
                     billing: {
                         name: `${address.firstName} ${address.lastName}`,
                         email: address.email,
@@ -103,7 +103,7 @@ const placeOrderGcash = async (req, res) => {
             items,
             address,
             amount,
-            paymentMethod: 'Gcash',
+            paymentMethod: "Gcash",
             payment: false,
             date: Date.now(),
             intentId,
@@ -112,7 +112,7 @@ const placeOrderGcash = async (req, res) => {
 
         res.json({ success: true, checkoutUrl });
     } catch (error) {
-        console.log('GCash Payment Error', error.response?.data || error.message);
+        console.log("GCash Payment Error", error.response?.data || error.message);
         res.json({
             success: false,
             message: error.response?.data?.errors?.[0]?.detail || error.message,
@@ -126,7 +126,7 @@ const verifyPayment = async (req, res) => {
         const { payment_intent_id: intentId } = req.body;
 
         if (!intentId) {
-            return res.json({ success: false, paid: false, message: 'Missing payment_intent_id' });
+            return res.json({ success: false, paid: false, message: "Missing payment_intent_id" });
         }
 
         // ✅ Call PayMongo to check latest intent status
@@ -134,20 +134,16 @@ const verifyPayment = async (req, res) => {
         const intent = intentRes.data.data;
         const status = intent.attributes.status;
 
-        if (status === 'succeeded') {
+        if (status === "succeeded") {
             // update only payment = true
-            await orderModel.findOneAndUpdate(
-                { intentId },
-                { $set: { payment: true } },
-                { new: true }
-            );
+            await orderModel.findOneAndUpdate({ intentId }, { $set: { payment: true } }, { new: true });
 
             return res.json({ success: true, paid: true, status });
         } else {
             return res.json({ success: true, paid: false, status });
         }
     } catch (error) {
-        console.error('Verify Error:', error.response?.data || error.message);
+        console.error("Verify Error:", error.response?.data || error.message);
         res.json({
             success: false,
             paid: false,
@@ -186,7 +182,7 @@ const updateStatus = async (req, res) => {
         const { orderId, status } = req.body;
 
         await orderModel.findByIdAndUpdate(orderId, { status });
-        res.json({ success: true, message: 'Order Status Updated' });
+        res.json({ success: true, message: "Order Status Updated" });
     } catch (error) {
         console.log(error);
         res.json({ success: false, message: error.message });

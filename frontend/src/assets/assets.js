@@ -30,6 +30,7 @@ import women_basketball from "./women_basketball.png";
 import kukz_boss from "./kukz_boss.png";
 import about_logo from "./about_logo.png";
 import owner from "./owner.png";
+import collection_banner from "./collection_banner.png";
 
 export const assets = {
     logo1,
@@ -64,4 +65,5 @@ export const assets = {
     kukz_boss,
     about_logo,
     owner,
+    collection_banner,
 };

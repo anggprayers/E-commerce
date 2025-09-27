@@ -17,6 +17,7 @@ const Edit = ({ token }) => {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState("");
+    const [sportsCategory, setSportsCategory] = useState("Basketball");
     const [category, setCategory] = useState("Men");
     const [subCategory, setSubcategory] = useState("Topwear");
     const [bestseller, setBestseller] = useState(false);
@@ -34,6 +35,7 @@ const Edit = ({ token }) => {
                     setName(p.name);
                     setDescription(p.description);
                     setPrice(p.price);
+                    setSportsCategory(p.sportsCategory);
                     setCategory(p.category);
                     setSubcategory(p.subCategory);
                     setBestseller(p.bestseller);
@@ -62,6 +64,7 @@ const Edit = ({ token }) => {
             formData.append("name", name);
             formData.append("description", description);
             formData.append("price", price);
+            formData.append("sportsCategory", sportsCategory);
             formData.append("category", category);
             formData.append("subCategory", subCategory);
             formData.append("bestseller", bestseller);
@@ -165,16 +168,37 @@ const Edit = ({ token }) => {
                 />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 max-w-2xl">
+                <div>
+                    <p className="mb-2">Sports Category</p>
+                    <select
+                        onChange={(e) => setSportsCategory(e.target.value)}
+                        value={sportsCategory}
+                        className="w-full lg:w-[250px] px-3 py-2"
+                    >
+                        <option value="Basketball">Basketball</option>
+                        <option value="Billiards">Billiards</option>
+                        <option value="Volleyball">Volleyball</option>
+                        <option value="Activewear">Activewear</option>
+                        <option value="Football">Football</option>
+                        <option value="Soccer">Soccer</option>
+                        <option value="Corporate">Corporate</option>
+                    </select>
+                </div>
                 <div>
                     <p className="mb-2">Product Category</p>
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2">
-                        <option value="Jerseyset">Jersey Set</option>
-                        <option value="Topsandtshirts">Tops & T-shirts</option>
+                    <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="w-full lg:w-[250px] px-3 py-2"
+                    >
+                        <option value="Jersey Set">Jersey Set</option>
+                        <option value="Tops & T-shirts">Tops & T-shirts</option>
                         <option value="Shorts">Shorts</option>
-                        <option value="Pantsandleggings">Pants & Leggings</option>
+                        <option value="Pants & Leggings">Pants & Leggings</option>
                         <option value="Hoodies">Hoodies</option>
                         <option value="Jackets">Jackets</option>
+                        <option value="P.E. Uniform">P.E. Uniform</option>
                     </select>
                 </div>
                 <div>
@@ -182,7 +206,7 @@ const Edit = ({ token }) => {
                     <select
                         value={subCategory}
                         onChange={(e) => setSubcategory(e.target.value)}
-                        className="w-full px-3 py-2"
+                        className="w-full lg:w-[250px] px-3 py-2"
                     >
                         <option value="Men">Men</option>
                         <option value="Women">Women</option>
@@ -194,7 +218,7 @@ const Edit = ({ token }) => {
                     <input
                         onChange={(e) => setPrice(e.target.value)}
                         value={price}
-                        className="w-full px-3 py-2 sm:w-[120px]"
+                        className="w-full lg:w-[250px] px-3 py-2 sm:w-[120px]"
                         type="number"
                         placeholder="25"
                     />

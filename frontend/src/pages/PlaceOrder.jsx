@@ -35,11 +35,18 @@ const PlaceOrder = () => {
             let orderItems = [];
             for (const items in cartItems) {
                 for (const item in cartItems[items]) {
-                    if (cartItems[items][item] > 0) {
+                    const cartEntry = cartItems[items][item];
+
+                    if (cartEntry.quantity > 0) {
                         const itemInfo = structuredClone(products.find((product) => product._id === items));
+
                         if (itemInfo) {
                             itemInfo.size = item;
-                            itemInfo.quantity = cartItems[items][item];
+                            itemInfo.quantity = cartEntry.quantity;
+                            itemInfo.frontName = cartEntry.frontName || "";
+                            itemInfo.backName = cartEntry.backName || "";
+                            itemInfo.jerseyNumber = cartEntry.jerseyNumber || "";
+
                             orderItems.push(itemInfo);
                         }
                     }

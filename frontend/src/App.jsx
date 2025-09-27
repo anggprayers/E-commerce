@@ -1,55 +1,90 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/home";
-import Collection from "./pages/Collection";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Product from "./pages/Product";
-import Cart from "./pages/Cart";
-import Login from "./pages/Login";
-import PlaceOrder from "./pages/PlaceOrder";
-import Orders from "./pages/Orders";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
-import { ToastContainer, toast } from "react-toastify";
-import Verify from "./pages/Verify";
+import { ToastContainer } from "react-toastify";
 import ScrollToTop from "./components/ScrollToTop";
-import Billiards from "./pages/Billiards";
-import Basketball from "./pages/Basketball";
-import Volleyball from "./pages/Volleyball";
-import Activewear from "./pages/Activewear";
-import Football from "./pages/Football";
-import Soccer from "./pages/Soccer";
-import Corporate from "./pages/Corporate";
+import PageLoader from "./components/PageLoader";
+import TopBanner from "./components/TopBanner";
+import ProtectedRoute from "./routes/ProtectedRoute";
+
+// Lazy load all pages
+const Home = lazy(() => import("./pages/Home"));
+const Collection = lazy(() => import("./pages/Collection"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Product = lazy(() => import("./pages/Product"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Login = lazy(() => import("./pages/Login"));
+const PlaceOrder = lazy(() => import("./pages/PlaceOrder"));
+const Orders = lazy(() => import("./pages/Orders"));
+const Verify = lazy(() => import("./pages/Verify"));
+const Billiards = lazy(() => import("./pages/Billiards"));
+const Basketball = lazy(() => import("./pages/Basketball"));
+const Volleyball = lazy(() => import("./pages/Volleyball"));
+const Activewear = lazy(() => import("./pages/Activewear"));
+const Football = lazy(() => import("./pages/Football"));
+const Soccer = lazy(() => import("./pages/Soccer"));
+const Corporate = lazy(() => import("./pages/Corporate"));
 
 const App = () => {
     return (
-        <div className="px-4 sm:px-[5vw] md:px-[7vw] 1g:px-[9vw]">
+        <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
             <ToastContainer />
+            <TopBanner />
             <Navbar />
             <SearchBar />
             <ScrollToTop />
+            {/* Suspense fallback with spinner + logo */}
+            <Suspense fallback={<PageLoader />}>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/customize-jersey" element={<div>Customize Jersey Page</div>} />
+                    <Route path="/collection" element={<Collection />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/product/:productId" element={<Product />} />
+                    {/* <Route path="/cart" element={<Cart />} /> */}
+                    <Route path="/login" element={<Login />} />
+                    {/* <Route path="/place-order" element={<PlaceOrder />} /> */}
+                    {/* <Route path="/orders" element={<Orders />} /> */}
+                    <Route path="/verify" element={<Verify />} />
+                    <Route path="/billiards" element={<Billiards />} />
+                    <Route path="/mens-basketball" element={<Basketball />} />
+                    <Route path="/volleyball" element={<Volleyball />} />
+                    <Route path="/activewear" element={<Activewear />} />
+                    <Route path="/football" element={<Football />} />
+                    <Route path="/soccer" element={<Soccer />} />
+                    <Route path="/corporate" element={<Corporate />} />
 
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/collection" element={<Collection />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/product/:productId" element={<Product />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/place-order" element={<PlaceOrder />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/verify" element={<Verify />} />
-                <Route path="/billiards" element={<Billiards />} />
-                <Route path="/mens-basketball" element={<Basketball />} />
-                <Route path="/volleyball" element={<Volleyball />} />
-                <Route path="/activewear" element={<Activewear />} />
-                <Route path="/football" element={<Football />} />
-                <Route path="/soccer" element={<Soccer />} />
-                <Route path="/corporate" element={<Corporate />} />
-            </Routes>
+                    {/* Protected routes */}
+                    <Route
+                        path="/cart"
+                        element={
+                            <ProtectedRoute>
+                                <Cart />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/place-order"
+                        element={
+                            <ProtectedRoute>
+                                <PlaceOrder />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/orders"
+                        element={
+                            <ProtectedRoute>
+                                <Orders />
+                            </ProtectedRoute>
+                        }
+                    />
+                </Routes>
+            </Suspense>
             <Footer />
         </div>
     );
