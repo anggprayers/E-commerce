@@ -8,6 +8,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import PageLoader from "./components/PageLoader";
 import TopBanner from "./components/TopBanner";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import Profile from "./pages/Profile";
 
 // Lazy load all pages
 const Home = lazy(() => import("./pages/Home"));
@@ -47,6 +48,7 @@ const App = () => {
                     <Route path="/product/:productId" element={<Product />} />
                     {/* <Route path="/cart" element={<Cart />} /> */}
                     <Route path="/login" element={<Login />} />
+                    <Route path="/my-profile" element={<Profile />} />
                     {/* <Route path="/place-order" element={<PlaceOrder />} /> */}
                     {/* <Route path="/orders" element={<Orders />} /> */}
                     <Route path="/verify" element={<Verify />} />

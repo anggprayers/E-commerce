@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { RxDotFilled } from "react-icons/rx";
 import { assets } from "../assets/assets";
 
-// Lazy load only when needed
 const BsChevronCompactLeft = lazy(() => import("react-icons/bs").then((m) => ({ default: m.BsChevronCompactLeft })));
 const BsChevronCompactRight = lazy(() => import("react-icons/bs").then((m) => ({ default: m.BsChevronCompactRight })));
 const BsPlayFill = lazy(() => import("react-icons/bs").then((m) => ({ default: m.BsPlayFill })));
@@ -16,16 +15,25 @@ const Slider = () => {
     ];
 
     const videoRef = useRef(null);
+    const sliderRef = useRef(null);
+
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
     const [isHovered, setIsHovered] = useState(false);
 
+    // Auto play/pause fix
     useEffect(() => {
         if (!videoRef.current) return;
-        if (isHovered) {
-            videoRef.current.pause();
-        } else if (isPlaying) {
-            videoRef.current.play();
+        const video = videoRef.current;
+        video.pause();
+
+        if (sliderImages[currentIndex].type === "video" && isPlaying && !isHovered) {
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch((err) => {
+                    if (err.name !== "AbortError") console.warn("Video play error:", err.name);
+                });
+            }
         }
     }, [isHovered, isPlaying, currentIndex]);
 
@@ -44,7 +52,7 @@ const Slider = () => {
         if (isPlaying) {
             videoRef.current.pause();
         } else {
-            videoRef.current.play();
+            videoRef.current.play().catch(() => {});
         }
         setIsPlaying(!isPlaying);
     };
@@ -57,6 +65,48 @@ const Slider = () => {
     const isVideo = sliderImages[currentIndex].type === "video";
     const currentTitle = sliderImages[currentIndex].title;
 
+    // Swipe & scroll navigation
+    useEffect(() => {
+        let startX = 0;
+        let endX = 0;
+
+        const handleTouchStart = (e) => {
+            startX = e.touches[0].clientX;
+        };
+
+        const handleTouchEnd = (e) => {
+            endX = e.changedTouches[0].clientX;
+            if (startX - endX > 50) {
+                nextSlide(); // swipe left
+            } else if (endX - startX > 50) {
+                prevSlide(); // swipe right
+            }
+        };
+
+        const handleWheel = (e) => {
+            if (e.deltaY > 0 || e.deltaX > 50) {
+                nextSlide();
+            } else if (e.deltaY < 0 || e.deltaX < -50) {
+                prevSlide();
+            }
+        };
+
+        const slider = sliderRef.current;
+        if (slider) {
+            slider.addEventListener("touchstart", handleTouchStart);
+            slider.addEventListener("touchend", handleTouchEnd);
+            slider.addEventListener("wheel", handleWheel, { passive: true });
+        }
+
+        return () => {
+            if (slider) {
+                slider.removeEventListener("touchstart", handleTouchStart);
+                slider.removeEventListener("touchend", handleTouchEnd);
+                slider.removeEventListener("wheel", handleWheel);
+            }
+        };
+    }, []);
+
     const LazyVideo = ({ src, videoRef }) => (
         <video
             ref={videoRef}
@@ -64,6 +114,7 @@ const Slider = () => {
             autoPlay
             loop
             muted
+            playsInline
             className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
         />
     );
@@ -79,9 +130,15 @@ const Slider = () => {
 
     return (
         <div
-            className="relative -mx-3 sm:-mx-[4vw] md:-mx-[6vw] lg:-mx-[8vw] pb-20 group"
+            ref={sliderRef}
+            className="relative -mx-3 sm:-mx-[4vw] md:-mx-[6vw] lg:-mx-[8vw] pb-20 group overflow-hidden"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onClick={() => {
+                if (window.innerWidth < 768) {
+                    setIsHovered((prev) => !prev);
+                }
+            }}
         >
             <Suspense fallback={<div className="w-full h-[300px] bg-gray-900 animate-pulse" />}>
                 {isVideo ? (
@@ -125,7 +182,6 @@ const Slider = () => {
 
             {/* Dots + Overlay Text */}
             <div className="relative flex flex-col items-center justify-center py-2">
-                {/* Dots */}
                 <div className="flex space-x-2">
                     {sliderImages.map((_, slideIndex) => (
                         <div
@@ -138,7 +194,6 @@ const Slider = () => {
                     ))}
                 </div>
 
-                {/* Overlay Text */}
                 <h2 className="mt-1.5 text-red-600 text-xl sm:text-2xl md:text-3xl lg:text-4xl uppercase font-bold text-center">
                     {currentTitle}
                 </h2>

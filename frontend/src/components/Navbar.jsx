@@ -66,6 +66,7 @@ const Navbar = () => {
                                 <p
                                     onClick={() => {
                                         setShowProfileMenu(false);
+                                        navigate("/my-profile");
                                     }}
                                     className="cursor-pointer hover:text-black"
                                 >

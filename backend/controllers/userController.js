@@ -1,10 +1,10 @@
-import validator from 'validator';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import userModel from '../models/userModel.js';
+import validator from "validator";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import userModel from "../models/userModel.js";
 
 const createToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET);
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
 // Route for user login
@@ -25,7 +25,7 @@ const loginUser = async (req, res) => {
             const token = createToken(user._id);
             res.json({ success: true, token });
         } else {
-            res.json({ success: false, message: 'Invalid credentials' });
+            res.json({ success: false, message: "Invalid credentials" });
         }
     } catch (error) {
         console.log(error);
@@ -40,15 +40,15 @@ const registerUser = async (req, res) => {
         // Check if user already exists or not
         const exists = await userModel.findOne({ email });
         if (exists) {
-            return res.json({ success: false, message: 'User already exists' });
+            return res.json({ success: false, message: "User already exists" });
         }
 
         // Validating email format & strong password
         if (!validator.isEmail(email)) {
-            return res.json({ success: false, message: 'Enter a valid email' });
+            return res.json({ success: false, message: "Enter a valid email" });
         }
         if (password.length < 8) {
-            return res.json({ success: false, message: 'Please enter a strong password' });
+            return res.json({ success: false, message: "Please enter a strong password" });
         }
 
         // Hashing password
@@ -80,7 +80,7 @@ const adminLogin = async (req, res) => {
             const token = jwt.sign(email + password, process.env.JWT_SECRET);
             res.json({ success: true, token });
         } else {
-            res.json({ success: false, message: 'Invalid Credentials!' });
+            res.json({ success: false, message: "Invalid Credentials!" });
         }
     } catch (error) {
         console.log(error);
@@ -88,4 +88,19 @@ const adminLogin = async (req, res) => {
     }
 };
 
-export { loginUser, registerUser, adminLogin };
+// Get logged-in user details
+const getUserDetails = async (req, res) => {
+    try {
+        const user = await userModel.findById(req.body.userId).select("-password -cartData");
+        if (!user) {
+            return res.json({ success: false, message: "User not found" });
+        }
+
+        res.json({ success: true, user });
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export { loginUser, registerUser, adminLogin, getUserDetails };

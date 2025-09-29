@@ -1,6 +1,20 @@
 /* Tailwind layers */
 @import "tailwindcss";
 
+@keyframes wiggle {
+    0%,
+    100% {
+        transform: rotate(-10deg);
+    }
+    50% {
+        transform: rotate(10deg);
+    }
+}
+
+.animate-wiggle {
+    animation: wiggle 0.6s ease-in-out infinite;
+}
+
 a.active hr {
     display: block;
 }

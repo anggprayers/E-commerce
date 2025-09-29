@@ -189,4 +189,16 @@ const updateStatus = async (req, res) => {
     }
 };
 
-export { placeOrder, placeOrderGcash, allOrders, userOrders, updateStatus, verifyPayment };
+// Get orders for the logged-in user
+const getUserOrders = async (req, res) => {
+    try {
+        const orders = await orderModel.find({ userId: req.body.userId }).sort({ date: -1 });
+
+        res.json({ success: true, orders });
+    } catch (error) {
+        console.error(error);
+        res.json({ success: false, message: error.message });
+    }
+};
+
+export { placeOrder, placeOrderGcash, allOrders, userOrders, updateStatus, verifyPayment, getUserOrders };

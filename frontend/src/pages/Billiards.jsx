@@ -148,7 +148,7 @@ const Billiards = () => {
 
     return (
         <>
-            <div className="relative w-full h-[150px] sm:h-[200px] md:h-[250px] lg:h-[285px]">
+            <div className="relative w-full h-[150px] sm:h-[200px] md:h-[250px] lg:h-[285px] border-t border-white">
                 <img src={assets.billiards} alt="Billiards" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
                 <div className="absolute inset-0 flex items-center justify-start px-6 sm:px-12">

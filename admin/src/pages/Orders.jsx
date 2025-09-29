@@ -87,7 +87,7 @@ const Orders = ({ token }) => {
                         key={index}
                     >
                         <img
-                            className="w-16 h-16 object-cover rounded"
+                            className="w-30 h-30 object-cover rounded"
                             src={order.items[0].image?.[0] || assets.parcel_icon}
                             alt={order.items[0].name}
                         />
@@ -141,7 +141,13 @@ const Orders = ({ token }) => {
                                     {order.payment ? "Done" : "Pending"}
                                 </span>
                             </p>
-                            <p>Date : {new Date(order.date).toLocaleDateString()}</p>
+                            <p className="text-gray-700 text-sm">
+                                Date: {new Date(order.date).toLocaleDateString()}{" "}
+                                {new Date(order.date).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                })}
+                            </p>
                         </div>
                         <p className="text-sm sm:text-[15px] font-extrabold">
                             {currency}{" "}
