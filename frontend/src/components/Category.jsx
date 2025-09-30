@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import { assets } from "../assets/assets";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Category = () => {
     const categories = [
@@ -42,18 +42,19 @@ const Category = () => {
                 className="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-3 sm:space-x-4 md:space-x-5 p-x snap-mandatory"
             >
                 {categories.map((item, index) => (
-                    <div
+                    <Link
                         key={index}
-                        onClick={() => navigate(item.path)}
-                        className="min-w-[60%] sm:min-w-[30%] md:min-w-[23%] flex-shrink-0 snap-start"
+                        to={item.path}
+                        className="min-w-[60%] sm:min-w-[30%] md:min-w-[23%] flex-shrink-0 snap-start block"
                     >
                         <img
                             src={item.src}
                             alt={item.title}
-                            className="w-full h-auto max-h-[600px] object-cover rounded-lg cursor-pointer"
+                            className="w-full h-auto max-h-[600px] object-cover rounded-lg"
+                            loading="lazy"
                         />
                         <p className="mt-3 text-base sm:text-lg font-medium text-white/80">{item.title}</p>
-                    </div>
+                    </Link>
                 ))}
             </div>
 

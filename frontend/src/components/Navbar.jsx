@@ -46,7 +46,7 @@ const Navbar = () => {
 
             <div className="flex items-center gap-6">
                 <img
-                    onClick={() => setShowSearch(true)}
+                    onClick={() => setShowSearch((prev) => !prev)}
                     src={assets.search_icon}
                     className="w-6 cursor-pointer"
                     alt="Search"

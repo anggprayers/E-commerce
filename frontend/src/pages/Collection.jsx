@@ -202,7 +202,7 @@ const Collection = () => {
 
                     {/* Gender Filter */}
                     <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilter ? "" : "hidden"} sm:block`}>
-                        <p className="mb-3 text-sm font-medium">GENDER</p>
+                        <p className="mb-3 text-sm font-medium">TYPE</p>
                         <div className="flex flex-col gap-2 text-sm font-light text-white">
                             <label className="flex gap-2">
                                 <input
@@ -211,7 +211,7 @@ const Collection = () => {
                                     checked={subCategory.includes("Men")}
                                     onChange={toggleSubCategory}
                                 />
-                                Men
+                                For Men
                             </label>
                             <label className="flex gap-2">
                                 <input
@@ -220,7 +220,7 @@ const Collection = () => {
                                     checked={subCategory.includes("Women")}
                                     onChange={toggleSubCategory}
                                 />
-                                Women
+                                For Women
                             </label>
                             <label className="flex gap-2">
                                 <input

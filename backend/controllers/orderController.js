@@ -129,7 +129,7 @@ const verifyPayment = async (req, res) => {
             return res.json({ success: false, paid: false, message: "Missing payment_intent_id" });
         }
 
-        // ✅ Call PayMongo to check latest intent status
+        // Call PayMongo to check latest intent status
         const intentRes = await paymongo.get(`/payment_intents/${intentId}`);
         const intent = intentRes.data.data;
         const status = intent.attributes.status;

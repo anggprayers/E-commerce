@@ -9,9 +9,11 @@ const ShopContextProvider = (props) => {
     const currency = "₱";
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [search, setSearch] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
     const [showSearch, setShowSearch] = useState(false);
     const [cartItems, setCartItems] = useState({});
     const [products, setProducts] = useState([]);
+    const [orders, setOrders] = useState([]);
     const [token, setToken] = useState(localStorage.getItem("token") || "");
     const navigate = useNavigate();
 
@@ -167,11 +169,28 @@ const ShopContextProvider = (props) => {
         }
     }, [token]);
 
+    // Update live search results
+    useEffect(() => {
+        if (!search) {
+            setSearchResults([]);
+            return;
+        }
+
+        const results = [
+            ...products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase())),
+            // Optionally include orders
+            ...orders.filter((o) => o.id.toLowerCase().includes(search.toLowerCase())),
+        ];
+
+        setSearchResults(results);
+    }, [search, products, orders]);
+
     const value = {
         products,
         currency,
         search,
         setSearch,
+        searchResults,
         showSearch,
         setShowSearch,
         cartItems,

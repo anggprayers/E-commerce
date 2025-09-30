@@ -9,6 +9,7 @@ import PageLoader from "./components/PageLoader";
 import TopBanner from "./components/TopBanner";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Profile from "./pages/Profile";
+import ScrollToHashElement from "./utils/ScrollToHashElement";
 
 // Lazy load all pages
 const Home = lazy(() => import("./pages/Home"));
@@ -86,6 +87,7 @@ const App = () => {
                         }
                     />
                 </Routes>
+                <ScrollToHashElement />
             </Suspense>
             <Footer />
         </div>

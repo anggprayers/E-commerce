@@ -65,7 +65,7 @@ const Slider = () => {
     const isVideo = sliderImages[currentIndex].type === "video";
     const currentTitle = sliderImages[currentIndex].title;
 
-    // Swipe & scroll navigation
+    // Swipe navigation for mobile only
     useEffect(() => {
         let startX = 0;
         let endX = 0;
@@ -83,50 +83,40 @@ const Slider = () => {
             }
         };
 
-        const handleWheel = (e) => {
-            if (e.deltaY > 0 || e.deltaX > 50) {
-                nextSlide();
-            } else if (e.deltaY < 0 || e.deltaX < -50) {
-                prevSlide();
-            }
-        };
-
         const slider = sliderRef.current;
         if (slider) {
-            slider.addEventListener("touchstart", handleTouchStart);
-            slider.addEventListener("touchend", handleTouchEnd);
-            slider.addEventListener("wheel", handleWheel, { passive: true });
+            slider.addEventListener("touchstart", handleTouchStart, { passive: true });
+            slider.addEventListener("touchend", handleTouchEnd, { passive: true });
         }
 
         return () => {
             if (slider) {
                 slider.removeEventListener("touchstart", handleTouchStart);
                 slider.removeEventListener("touchend", handleTouchEnd);
-                slider.removeEventListener("wheel", handleWheel);
             }
         };
     }, []);
 
-    const LazyVideo = ({ src, videoRef }) => (
-        <video
-            ref={videoRef}
-            src={src}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
-        />
-    );
+    // const LazyVideo = ({ src, videoRef }) => (
+    //     <video
+    //         ref={videoRef}
+    //         src={src}
+    //         autoPlay
+    //         loop
+    //         muted
+    //         playsInline
+    //         className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
+    //     />
+    // );
 
-    const LazyImage = ({ src }) => (
-        <img
-            src={src}
-            alt="slide"
-            loading="lazy"
-            className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
-        />
-    );
+    // const LazyImage = ({ src }) => (
+    //     <img
+    //         src={src}
+    //         alt="slide"
+    //         loading="lazy"
+    //         className="w-full h-[280px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
+    //     />
+    // );
 
     return (
         <div
@@ -141,11 +131,26 @@ const Slider = () => {
             }}
         >
             <Suspense fallback={<div className="w-full h-[300px] bg-gray-900 animate-pulse" />}>
-                {isVideo ? (
-                    <LazyVideo src={sliderImages[currentIndex].src} videoRef={videoRef} />
-                ) : (
-                    <LazyImage src={sliderImages[currentIndex].src} />
-                )}
+                <div className="w-full max-h-[720px] sm:max-h-[670px] md:max-h-[620px] lg:max-h-[570px] overflow-hidden">
+                    {isVideo ? (
+                        <video
+                            ref={videoRef}
+                            src={sliderImages[currentIndex].src}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="w-full h-full object-contain"
+                        />
+                    ) : (
+                        <img
+                            src={sliderImages[currentIndex].src}
+                            alt="slide"
+                            loading="lazy"
+                            className="w-full h-full object-contain"
+                        />
+                    )}
+                </div>
             </Suspense>
 
             {/* Left Arrow */}

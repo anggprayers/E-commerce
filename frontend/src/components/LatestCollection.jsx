@@ -27,15 +27,11 @@ const LatestCollection = () => {
     }, [products]);
 
     return (
-        <div className="my-10">
-            <div className="text-center py-8 text-3xl">
-                <Title text1={"LATEST"} text2={"COLLECTIONS"} />
-                <p className="w-3/4 m-auto text-xs sm:text-sm md:text-base text-white/80">
-                    Explore the newest Kukz Sportswear arrivals — designed with innovation, comfort, and performance in
-                    mind. From customized styles to sustainable activewear, our latest drops keep every athlete ready on
-                    and off the game.
-                </p>
+        <section className="py-10">
+            <div className="text-center py-6 text-3xl">
+                <Title text1="LATEST" text2="COLLECTIONS" />
             </div>
+
             {/* Rendering Products */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
                 {latestProducts.length > 0 ? (
@@ -52,7 +48,7 @@ const LatestCollection = () => {
                     <p className="col-span-full text-center text-white/70">No new products in the last 7 days.</p>
                 )}
             </div>
-        </div>
+        </section>
     );
 };
 

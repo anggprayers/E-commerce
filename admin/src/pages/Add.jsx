@@ -5,10 +5,7 @@ import { backendUrl } from "../App";
 import { toast } from "react-toastify";
 
 const Add = ({ token }) => {
-    const [image1, setImage1] = useState(false);
-    const [image2, setImage2] = useState(false);
-    const [image3, setImage3] = useState(false);
-    const [image4, setImage4] = useState(false);
+    const [images, setImages] = useState([null, null, null, null]);
 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -32,10 +29,9 @@ const Add = ({ token }) => {
             formData.append("bestseller", bestseller);
             formData.append("sizes", JSON.stringify(sizes));
 
-            image1 && formData.append("image1", image1);
-            image2 && formData.append("image2", image2);
-            image3 && formData.append("image3", image3);
-            image4 && formData.append("image4", image4);
+            images.forEach((img, i) => {
+                if (img) formData.append(`image${i + 1}`, img);
+            });
 
             const response = await axios.post(backendUrl + "/api/product/add", formData, {
                 headers: { token },
@@ -46,10 +42,7 @@ const Add = ({ token }) => {
                 // reset form
                 setName("");
                 setDescription("");
-                setImage1(false);
-                setImage2(false);
-                setImage3(false);
-                setImage4(false);
+                setImages([null, null, null, null]); // reset images
                 setPrice("");
                 setSizes([]);
                 setSportsCategory("Basketball");
@@ -99,16 +92,18 @@ const Add = ({ token }) => {
                         <label key={num} htmlFor={`image${num}`}>
                             <img
                                 className="w-20"
-                                src={
-                                    !eval(`image${num}`) ? assets.upload_area : URL.createObjectURL(eval(`image${num}`))
-                                }
+                                src={!images[num - 1] ? assets.upload_area : URL.createObjectURL(images[num - 1])}
                                 alt=""
                             />
                             <input
-                                onChange={(e) => eval(`setImage${num}`)(e.target.files[0])}
                                 type="file"
                                 id={`image${num}`}
                                 hidden
+                                onChange={(e) => {
+                                    const newImages = [...images];
+                                    newImages[num - 1] = e.target.files[0];
+                                    setImages(newImages);
+                                }}
                             />
                         </label>
                     ))}
@@ -161,7 +156,11 @@ const Add = ({ token }) => {
 
                 <div>
                     <p className="mb-2">Product Category</p>
-                    <select onChange={(e) => setCategory(e.target.value)} className="w-full lg:w-[250px] px-3 py-2">
+                    <select
+                        onChange={(e) => setCategory(e.target.value)}
+                        value={category}
+                        className="w-full lg:w-[250px] px-3 py-2"
+                    >
                         <option value="Jersey Set">Jersey Set</option>
                         <option value="Tops & T-shirts">Tops & T-shirts</option>
                         <option value="Shorts">Shorts</option>
@@ -174,7 +173,11 @@ const Add = ({ token }) => {
 
                 <div>
                     <p className="mb-2">Gender</p>
-                    <select onChange={(e) => setSubcategory(e.target.value)} className="w-full lg:w-[250px] px-3 py-2">
+                    <select
+                        onChange={(e) => setSubcategory(e.target.value)}
+                        value={subCategory}
+                        className="w-full lg:w-[250px] px-3 py-2"
+                    >
                         <option value="Men">Men</option>
                         <option value="Women">Women</option>
                         <option value="Unisex">Unisex</option>

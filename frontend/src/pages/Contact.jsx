@@ -1,25 +1,81 @@
-import React from "react";
+import React, { useContext, useState } from "react";
+import axios from "axios";
 import Title from "../components/Title";
 import NewsLetterBox from "../components/NewsLetterBox";
+import { FaFolderOpen } from "react-icons/fa";
+import { ShopContext } from "../context/ShopContext";
 
 const Contact = () => {
+    const { backendUrl } = useContext(ShopContext);
+    const [formData, setFormData] = useState({
+        name: "",
+        contact: "",
+        email: "",
+        subject: "",
+        message: "",
+    });
+
+    const [loading, setLoading] = useState(false);
+    const [successMsg, setSuccessMsg] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
+    const [file, setFile] = useState(null);
+
+    const handleChange = (e) => {
+        setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setSuccessMsg("");
+        setErrorMsg("");
+
+        try {
+            const data = new FormData();
+            Object.entries(formData).forEach(([key, value]) => {
+                data.append(key, value);
+            });
+            if (file) {
+                data.append("file", file);
+            }
+
+            const res = await axios.post(backendUrl + "/api/email/send", data, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            if (res.data.success) {
+                setSuccessMsg("Email sent successfully!");
+                setFormData({ name: "", contact: "", email: "", subject: "", message: "" });
+                setFile(null);
+            } else {
+                setErrorMsg(res.data.error || "Failed to send email.");
+            }
+        } catch (err) {
+            setErrorMsg(err.response?.data?.error || "Something went wrong.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div>
             <div className="text-center text-2xl pt-10 border-t border-white">
                 <Title text1={"CONTACT"} text2={"US"} />
             </div>
+
+            {/* Map + Store Info */}
             <div className="my-10 flex flex-col justify-center md:flex-row gap-10 mb-28">
-                {/* Replaced image with Google Maps iframe */}
                 <div className="w-full md:max-w-[480px]">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3860.6062108258675!2d121.05049287545889!3d14.621494635867405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397b7bf0b14e91f%3A0x3afae5e3d0ba6969!2sRegus%20-%20Manila%2C%20Gateway%20Tower%20-%20Quezon%20City!5e0!3m2!1sen!2sph!4v1757874272152!5m2!1sen!2sph"
-                        width="500"
-                        height="450"
-                        style={{ border: 0 }}
-                        allowFullScreen=""
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                    />
+                    <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3860.6062108258675!2d121.05049287545889!3d14.621494635867405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397b7bf0b14e91f%3A0x3afae5e3d0ba6969!2sRegus%20-%20Manila%2C%20Gateway%20Tower%20-%20Quezon%20City!5e0!3m2!1sen!2sph!4v1757874272152!5m2!1sen!2sph"
+                            className="absolute top-0 left-0 w-full h-full"
+                            style={{ border: 0 }}
+                            allowFullScreen=""
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        />
+                    </div>
                 </div>
 
                 <div className="flex flex-col justify-center items-start gap-6">
@@ -36,25 +92,24 @@ const Contact = () => {
                 </div>
             </div>
 
-            {/* Contact Form Only */}
+            {/* Contact Form */}
             <div className="flex justify-center mb-28 text-white">
-                <form
-                    action="https://api.web3forms.com/submit"
-                    method="POST"
-                    className="flex flex-col w-full md:w-1/2 gap-4 p-6"
-                >
+                <form id="contact-form" className="flex flex-col w-full md:w-1/2 gap-4 p-6" onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <h2 className="text-2xl font-bold text-white text-center">Get in touch</h2>
                         <hr className="border-t-2 border-red-500 mt-2 w-20 mx-auto" />
                     </div>
 
-                    <input type="hidden" name="access_key" value="1410fca1-78e0-4a84-8767-158a1c6974fa" />
+                    {successMsg && <p className="text-green-500 text-center">{successMsg}</p>}
+                    {errorMsg && <p className="text-red-500 text-center">{errorMsg}</p>}
 
                     <input
                         type="text"
                         name="name"
                         placeholder="Your Name"
                         className="p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none placeholder-gray-500"
+                        value={formData.name}
+                        onChange={handleChange}
                         required
                     />
                     <input
@@ -64,7 +119,8 @@ const Contact = () => {
                         pattern="^\+639\d{9}$"
                         maxLength="13"
                         className="p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none placeholder-gray-500"
-                        required
+                        value={formData.contact}
+                        onChange={handleChange}
                         onInput={(e) => {
                             let value = e.target.value;
 
@@ -77,12 +133,24 @@ const Contact = () => {
                             }
                             e.target.value = value;
                         }}
+                        required
                     />
                     <input
                         type="email"
                         name="email"
                         placeholder="Your Email"
                         className="p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none placeholder-gray-500"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                    />
+                    <input
+                        type="text"
+                        name="subject"
+                        placeholder="Subject"
+                        className="p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none placeholder-gray-500"
+                        value={formData.subject}
+                        onChange={handleChange}
                         required
                     />
                     <textarea
@@ -90,15 +158,43 @@ const Contact = () => {
                         placeholder="Your Message"
                         rows="5"
                         className="p-3 border rounded-lg focus:ring-2 focus:ring-black outline-none placeholder-gray-500"
+                        value={formData.message}
+                        onChange={handleChange}
                         required
-                    ></textarea>
+                    />
+                    {/* File Upload */}
+                    <div className="flex flex-col">
+                        <label
+                            htmlFor="file"
+                            className="cursor-pointer flex items-center justify-center gap-2 px-4 py-2 
+                             text-white border border-white/30 rounded-lg 
+                            hover:bg-red-500 hover:border-red-500 transition duration-200"
+                        >
+                            <FaFolderOpen className="text-lg text-amber-500" />
+                            Choose File
+                        </label>
+                        <input
+                            id="file"
+                            type="file"
+                            name="file"
+                            accept="image/*"
+                            onChange={(e) => setFile(e.target.files[0])}
+                            className="hidden"
+                        />
+                        {file && (
+                            <p className="text-sm text-gray-400 mt-2">
+                                Selected: <span className="text-white">{file.name}</span>
+                            </p>
+                        )}
+                    </div>
 
                     <div className="flex justify-center">
                         <button
                             type="submit"
+                            disabled={loading}
                             className="flex items-center justify-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-red-600 font-bold w-32"
                         >
-                            Submit
+                            {loading ? "Sending..." : "Submit"}
                         </button>
                     </div>
                 </form>
