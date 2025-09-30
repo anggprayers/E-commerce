@@ -108,7 +108,12 @@ const Orders = () => {
                                 />
                                 <p className="text-sm md:text-base">{item.status}</p>
                             </div>
-                            <button onClick={loadOrderData} className="border px-4 py-2 text-sm font-medium rounded-sm">
+                            <button
+                                onClick={loadOrderData}
+                                className="cursor-pointer flex items-center justify-center px-4 py-2 
+             text-white border border-white rounded-lg 
+             hover:bg-red-500 hover:border-red-500 transition duration-200 text-sm font-medium"
+                            >
                                 Track Order
                             </button>
                         </div>

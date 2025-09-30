@@ -18,7 +18,7 @@ const Contact = () => {
     const [loading, setLoading] = useState(false);
     const [successMsg, setSuccessMsg] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
-    const [file, setFile] = useState(null);
+    const [files, setFiles] = useState({ front: null, back: null, side: null });
 
     const handleChange = (e) => {
         setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -35,9 +35,11 @@ const Contact = () => {
             Object.entries(formData).forEach(([key, value]) => {
                 data.append(key, value);
             });
-            if (file) {
-                data.append("file", file);
-            }
+
+            // Append each file if it exists
+            if (files.front) data.append("frontDesign", files.front);
+            if (files.back) data.append("backDesign", files.back);
+            if (files.side) data.append("sideDesign", files.side);
 
             const res = await axios.post(backendUrl + "/api/email/send", data, {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -46,12 +48,16 @@ const Contact = () => {
             if (res.data.success) {
                 setSuccessMsg("Email sent successfully!");
                 setFormData({ name: "", contact: "", email: "", subject: "", message: "" });
-                setFile(null);
+                setFiles({ front: null, back: null, side: null }); // reset all 3
+
+                setTimeout(() => setSuccessMsg(""), 5000);
             } else {
                 setErrorMsg(res.data.error || "Failed to send email.");
+                setTimeout(() => setErrorMsg(""), 5000);
             }
         } catch (err) {
             setErrorMsg(err.response?.data?.error || "Something went wrong.");
+            setTimeout(() => setErrorMsg(""), 5000);
         } finally {
             setLoading(false);
         }
@@ -123,7 +129,6 @@ const Contact = () => {
                         onChange={handleChange}
                         onInput={(e) => {
                             let value = e.target.value;
-
                             if (!value.startsWith("+639")) {
                                 value = "+639";
                             }
@@ -162,30 +167,88 @@ const Contact = () => {
                         onChange={handleChange}
                         required
                     />
-                    {/* File Upload */}
-                    <div className="flex flex-col">
-                        <label
-                            htmlFor="file"
-                            className="cursor-pointer flex items-center justify-center gap-2 px-4 py-2 
-                             text-white border border-white/30 rounded-lg 
-                            hover:bg-red-500 hover:border-red-500 transition duration-200"
-                        >
-                            <FaFolderOpen className="text-lg text-amber-500" />
-                            Choose File
-                        </label>
-                        <input
-                            id="file"
-                            type="file"
-                            name="file"
-                            accept="image/*"
-                            onChange={(e) => setFile(e.target.files[0])}
-                            className="hidden"
-                        />
-                        {file && (
-                            <p className="text-sm text-gray-400 mt-2">
-                                Selected: <span className="text-white">{file.name}</span>
-                            </p>
-                        )}
+
+                    {/* File Uploads */}
+                    <div className="flex flex-col gap-4">
+                        <label className="text-sm font-medium text-white">Upload Your Designs (Optional)</label>
+
+                        {/* Front Design */}
+                        <div className="flex flex-col gap-2">
+                            <label
+                                htmlFor="frontDesign"
+                                className="cursor-pointer flex items-center justify-start gap-2 px-4 py-2 
+                text-white/80 border border-white/30 rounded-lg 
+                hover:bg-red-500 hover:border-red-500 transition duration-200"
+                            >
+                                <FaFolderOpen className="text-lg text-amber-500" />
+                                Front Design
+                            </label>
+                            <input
+                                id="frontDesign"
+                                type="file"
+                                name="frontDesign"
+                                accept="image/*"
+                                onChange={(e) => setFiles((prev) => ({ ...prev, front: e.target.files[0] }))}
+                                className="hidden"
+                            />
+                            {files.front && (
+                                <p className="text-sm text-gray-400 mt-1">
+                                    Selected: <span className="text-white">{files.front.name}</span>
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Back Design */}
+                        <div className="flex flex-col gap-2">
+                            <label
+                                htmlFor="backDesign"
+                                className="cursor-pointer flex items-center justify-start gap-2 px-4 py-2 
+                text-white/80 border border-white/30 rounded-lg 
+                hover:bg-red-500 hover:border-red-500 transition duration-200"
+                            >
+                                <FaFolderOpen className="text-lg text-amber-500" />
+                                Upper Back Design
+                            </label>
+                            <input
+                                id="backDesign"
+                                type="file"
+                                name="backDesign"
+                                accept="image/*"
+                                onChange={(e) => setFiles((prev) => ({ ...prev, back: e.target.files[0] }))}
+                                className="hidden"
+                            />
+                            {files.back && (
+                                <p className="text-sm text-gray-400 mt-1">
+                                    Selected: <span className="text-white">{files.back.name}</span>
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Side Design */}
+                        <div className="flex flex-col gap-2">
+                            <label
+                                htmlFor="sideDesign"
+                                className="cursor-pointer flex items-center justify-start gap-2 px-4 py-2 
+                text-white/80 border border-white/30 rounded-lg 
+                hover:bg-red-500 hover:border-red-500 transition duration-200"
+                            >
+                                <FaFolderOpen className="text-lg text-amber-500" />
+                                Side Design
+                            </label>
+                            <input
+                                id="sideDesign"
+                                type="file"
+                                name="sideDesign"
+                                accept="image/*"
+                                onChange={(e) => setFiles((prev) => ({ ...prev, side: e.target.files[0] }))}
+                                className="hidden"
+                            />
+                            {files.side && (
+                                <p className="text-sm text-gray-400 mt-1">
+                                    Selected: <span className="text-white">{files.side.name}</span>
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex justify-center">

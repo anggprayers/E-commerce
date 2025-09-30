@@ -3,7 +3,7 @@ import LatestCollection from "../components/LatestCollection";
 import BestSeller from "../components/BestSeller";
 import OurPolicy from "../components/OurPolicy";
 import NewsLetterBox from "../components/NewsLetterBox";
-import Slider from "../components/Slider";
+import Slider from "../components/Slider/Slider";
 import Category from "../components/Category";
 
 const Home = () => {

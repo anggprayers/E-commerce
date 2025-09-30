@@ -16,8 +16,6 @@ const Category = () => {
 
     const scrollRef = useRef(null);
 
-    const navigate = useNavigate();
-
     const scrollLeft = () => {
         if (scrollRef.current) {
             const cardWidth = scrollRef.current.firstChild.getBoundingClientRect().width;

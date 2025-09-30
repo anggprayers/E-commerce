@@ -1,110 +1,56 @@
-import React, { useContext, useEffect, useState, lazy, useRef } from "react";
+import React, { useContext, useEffect, useState, useRef, lazy } from "react";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import Pagination from "../components/Pagination";
-import { motion, AnimatePresence } from "framer-motion";
-import CloudinaryImage from "../components/CloudinaryImage";
+import Banner from "../components/Football/Banner.jsx";
+import Filters from "../components/Basketball/Filters";
+import SortingBar from "../components/Basketball/SortingBar";
+import ProductGrid from "../components/Basketball/ProductGrid";
 
 const ProductItem = lazy(() => import("../components/ProductItem"));
 
 const Football = () => {
     const { products, search, showSearch } = useContext(ShopContext);
+
+    // state
     const [showFilter, setShowFilter] = useState(false);
     const [filterProducts, setFilterProducts] = useState([]);
 
-    const baseImg = assets.football;
+    const [sortType, setSortType] = useState(() => sessionStorage.getItem("footballSortType") || "relevant");
+    const [currentPage, setCurrentPage] = useState(
+        () => parseInt(sessionStorage.getItem("footballCurrentPage"), 10) || 1
+    );
+    const [category, setCategory] = useState(() => JSON.parse(sessionStorage.getItem("footballCategory")) || []);
+    const [subCategory, setSubCategory] = useState(
+        () => JSON.parse(sessionStorage.getItem("footballSubCategory")) || []
+    );
 
-    // --- Persisted States ---
-    const [sortType, setSortType] = useState(() => {
-        const saved = sessionStorage.getItem("footballSortType");
-        return saved || "relevant";
-    });
+    const productsRef = useRef(null);
 
-    const [currentPage, setCurrentPage] = useState(() => {
-        const saved = sessionStorage.getItem("footballCurrentPage");
-        return saved ? parseInt(saved, 10) : 1;
-    });
+    // Persist states
+    useEffect(() => sessionStorage.setItem("footballCategory", JSON.stringify(category)), [category]);
+    useEffect(() => sessionStorage.setItem("footballSubCategory", JSON.stringify(subCategory)), [subCategory]);
+    useEffect(() => sessionStorage.setItem("footballCurrentPage", currentPage), [currentPage]);
+    useEffect(() => sessionStorage.setItem("footballSortType", sortType), [sortType]);
 
-    const [category, setCategory] = useState(() => {
-        const saved = sessionStorage.getItem("footballCategory");
-        return saved ? JSON.parse(saved) : [];
-    });
-
-    const [subCategory, setSubCategory] = useState(() => {
-        const saved = sessionStorage.getItem("footballSubCategory");
-        return saved ? JSON.parse(saved) : [];
-    });
-
-    // --- Handlers ---
-    const toggleCategory = (e) => {
-        if (category.includes(e.target.value)) {
-            setCategory((prev) => prev.filter((item) => item !== e.target.value));
-        } else {
-            setCategory((prev) => [...prev, e.target.value]);
-        }
-    };
-
-    const toggleSubCategory = (e) => {
-        if (subCategory.includes(e.target.value)) {
-            setSubCategory((prev) => prev.filter((item) => item !== e.target.value));
-        } else {
-            setSubCategory((prev) => [...prev, e.target.value]);
-        }
-    };
-
-    // --- Persist to sessionStorage ---
-    useEffect(() => {
-        sessionStorage.setItem("footballCategory", JSON.stringify(category));
-    }, [category]);
-
-    useEffect(() => {
-        sessionStorage.setItem("footballSubCategory", JSON.stringify(subCategory));
-    }, [subCategory]);
-
-    useEffect(() => {
-        sessionStorage.setItem("footballCurrentPage", currentPage);
-    }, [currentPage]);
-
-    useEffect(() => {
-        sessionStorage.setItem("footballSortType", sortType);
-    }, [sortType]);
-
-    // --- Clear sessionStorage on unmount ---
+    // Cleanup
     useEffect(() => {
         return () => {
-            sessionStorage.removeItem("footballCategory");
-            sessionStorage.removeItem("footballSubCategory");
-            sessionStorage.removeItem("footballCurrentPage");
-            sessionStorage.removeItem("footballSortType");
+            ["footballCategory", "footballSubCategory", "footballCurrentPage", "footballSortType"].forEach((key) =>
+                sessionStorage.removeItem(key)
+            );
         };
     }, []);
 
-    // Ref for products section
-    const productsRef = useRef(null);
-
-    // --- Update filtered products ---
+    // Filtering
     useEffect(() => {
-        let productsCopy = products.slice();
+        let copy = products.filter((p) => p.sportsCategory?.toLowerCase() === "football");
 
-        productsCopy = productsCopy.filter((item) => item.sportsCategory?.toLowerCase().trim() === "football");
+        if (showSearch && search)
+            copy = copy.filter((p) => p.name?.toLowerCase().includes(search.toLowerCase().trim()));
 
-        if (showSearch && search) {
-            productsCopy = productsCopy.filter((item) =>
-                item.name?.toLowerCase().includes(search.toLowerCase().trim())
-            );
-        }
-
-        if (category.length > 0) {
-            productsCopy = productsCopy.filter((item) =>
-                category.some((cat) => item.category?.toLowerCase().trim() === cat.toLowerCase().trim())
-            );
-        }
-
-        if (subCategory.length > 0) {
-            productsCopy = productsCopy.filter((item) =>
-                subCategory.some((sub) => item.subCategory?.toLowerCase().trim() === sub.toLowerCase().trim())
-            );
-        }
+        if (category.length) copy = copy.filter((p) => category.includes(p.category));
+        if (subCategory.length) copy = copy.filter((p) => subCategory.includes(p.subCategory));
 
         const today = new Date();
         const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
@@ -112,28 +58,28 @@ const Football = () => {
 
         switch (sortType) {
             case "low-high":
-                productsCopy.sort((a, b) => a.price - b.price);
+                copy.sort((a, b) => a.price - b.price);
                 break;
             case "high-low":
-                productsCopy.sort((a, b) => b.price - a.price);
+                copy.sort((a, b) => b.price - a.price);
                 break;
             case "bestseller":
-                productsCopy = productsCopy.filter((item) => item.bestseller);
+                copy = copy.filter((p) => p.bestseller);
                 break;
             case "latest-today":
-                productsCopy = productsCopy.filter((item) => item.date >= startOfToday);
+                copy = copy.filter((p) => p.date >= startOfToday);
                 break;
             case "latest-7days":
-                productsCopy = productsCopy.filter((item) => item.date >= sevenDaysAgo);
+                copy = copy.filter((p) => p.date >= sevenDaysAgo);
                 break;
             default:
                 break;
         }
 
-        setFilterProducts(productsCopy);
+        setFilterProducts(copy);
     }, [products, category, subCategory, search, showSearch, sortType]);
 
-    // Reset to page 1 when filters/search/sort change (but not on first load)
+    // Reset page on filter change
     const isFirstLoad = useRef(true);
     useEffect(() => {
         if (isFirstLoad.current) {
@@ -143,177 +89,34 @@ const Football = () => {
         setCurrentPage(1);
     }, [category, subCategory, search, showSearch, sortType]);
 
+    // Pagination
     const itemsPerPage = 12;
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filterProducts.slice(indexOfFirstItem, indexOfLastItem);
+    const indexOfLast = currentPage * itemsPerPage;
+    const indexOfFirst = indexOfLast - itemsPerPage;
+    const currentItems = filterProducts.slice(indexOfFirst, indexOfLast);
     const totalPages = Math.ceil(filterProducts.length / itemsPerPage);
 
     return (
         <>
-            <div className="relative w-full h-[150px] sm:h-[200px] md:h-[250px] lg:h-[285px]">
-                <CloudinaryImage
-                    baseUrl={baseImg}
-                    alt="Football Banner"
-                    widths={[768, 1280, 1920]}
-                    desiredHeight={700}
-                    className="w-full h-full object-cover object-top"
-                    loading="eager"
-                    fetchPriority="high"
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
-                <div className="absolute inset-0 flex items-center justify-start px-6 sm:px-12">
-                    <h1 className="text-white text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-wide">
-                        FOOTBALL
-                    </h1>
-                </div>
-            </div>
-
+            <Banner baseImg={assets.football} />
             <div ref={productsRef} className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t border-white">
-                {/* Filters */}
-                <div className="min-w-60 text-white">
-                    <p
-                        onClick={() => setShowFilter(!showFilter)}
-                        className="my-2 text-xl flex items-center cursor-pointer gap-2"
-                    >
-                        FILTERS
-                        <img
-                            className={`h-3 sm:hidden transition-transform ${
-                                showFilter ? "rotate-[270deg]" : "rotate-0"
-                            }`}
-                            src={assets.dropdown_icon}
-                            alt=""
-                        />
-                    </p>
-
-                    {/* Category Filter */}
-                    <div className={`border border-gray-300 pl-5 py-3 mt-6 ${showFilter ? "" : "hidden"} sm:block`}>
-                        <p className="mb-3 text-sm font-medium">CATEGORIES</p>
-                        <div className="flex flex-col gap-2 text-sm font-light text-white">
-                            {[
-                                "Jersey Set",
-                                "Tops & T-shirts",
-                                "Shorts",
-                                "Pants & Leggings",
-                                "Hoodies",
-                                "Jackets",
-                                "P.E. Uniform",
-                            ].map((cat) => (
-                                <label key={cat} className="flex gap-2">
-                                    <input
-                                        type="checkbox"
-                                        className="w-3 accent-red-500"
-                                        value={cat}
-                                        checked={category.includes(cat)}
-                                        onChange={toggleCategory}
-                                    />
-                                    {cat}
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Gender Filter */}
-                    <div className={`border border-gray-300 pl-5 py-3 my-5 ${showFilter ? "" : "hidden"} sm:block`}>
-                        <p className="mb-3 text-sm font-medium">GENDER</p>
-                        <div className="flex flex-col gap-2 text-sm font-light text-white">
-                            <label className="flex gap-2">
-                                <input
-                                    type="checkbox"
-                                    value="Men"
-                                    checked={subCategory.includes("Men")}
-                                    onChange={toggleSubCategory}
-                                />
-                                Men
-                            </label>
-                            <label className="flex gap-2">
-                                <input
-                                    type="checkbox"
-                                    value="Women"
-                                    checked={subCategory.includes("Women")}
-                                    onChange={toggleSubCategory}
-                                />
-                                Women
-                            </label>
-                            <label className="flex gap-2">
-                                <input
-                                    type="checkbox"
-                                    value="Unisex"
-                                    checked={subCategory.includes("Unisex")}
-                                    onChange={toggleSubCategory}
-                                />
-                                Unisex
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Products + Sorting */}
+                <Filters
+                    showFilter={showFilter}
+                    setShowFilter={setShowFilter}
+                    category={category}
+                    setCategory={setCategory}
+                    subCategory={subCategory}
+                    setSubCategory={setSubCategory}
+                />
                 <div className="flex-1">
-                    <div className="flex justify-between text-base sm:text-2xl mb-4">
-                        <p className="text-white text-sm sm:text-base mb-3">
-                            {filterProducts.length > 0 ? (
-                                <>
-                                    Showing <span className="font-bold">{indexOfFirstItem + 1}</span> -{" "}
-                                    <span className="font-bold">
-                                        {Math.min(indexOfLastItem, filterProducts.length)}
-                                    </span>{" "}
-                                    of <span className="font-bold">{filterProducts.length}</span> products
-                                </>
-                            ) : (
-                                "No products found"
-                            )}
-                        </p>
-
-                        <select
-                            value={sortType}
-                            onChange={(e) => setSortType(e.target.value)}
-                            className="border-2 border-gray-300 text-sm px-2 bg-transparent text-white"
-                        >
-                            <option className="text-black" value="relevant">
-                                Sort by: Relevant
-                            </option>
-                            <option className="text-black" value="low-high">
-                                Sort by: Low to High
-                            </option>
-                            <option className="text-black" value="high-low">
-                                Sort by: High to Low
-                            </option>
-                            <option className="text-black" value="bestseller">
-                                Sort by: Best Sellers
-                            </option>
-                            <option className="text-black" value="latest-today">
-                                Sort by: Latest (Today)
-                            </option>
-                            <option className="text-black" value="latest-7days">
-                                Sort by: Latest (7 Days)
-                            </option>
-                        </select>
-                    </div>
-
-                    {/* Product List */}
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={currentPage}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.3, ease: "easeInOut" }}
-                            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6"
-                        >
-                            {currentItems.map((item, index) => (
-                                <ProductItem
-                                    key={item._id || index}
-                                    id={item._id}
-                                    name={item.name}
-                                    price={item.price}
-                                    image={item.image}
-                                />
-                            ))}
-                        </motion.div>
-                    </AnimatePresence>
-
-                    {/* Pagination */}
+                    <SortingBar
+                        filterProducts={filterProducts}
+                        indexOfFirst={indexOfFirst}
+                        indexOfLast={indexOfLast}
+                        sortType={sortType}
+                        setSortType={setSortType}
+                    />
+                    <ProductGrid items={currentItems} ProductItem={ProductItem} currentPage={currentPage} />
                     {totalPages > 1 && (
                         <Pagination
                             currentPage={currentPage}

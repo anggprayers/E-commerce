@@ -1,13 +1,23 @@
 import multer from "multer";
+import fs from "fs";
 
-// Storage config (keep original name)
+// Ensure uploads folder exists
+const uploadDir = "uploads";
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+// Storage config
 const storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, uploadDir);
+    },
     filename: function (req, file, callback) {
-        callback(null, file.originalname);
+        callback(null, Date.now() + "-" + file.originalname);
     },
 });
 
-// File filter (allow only images)
+// File filter (only images)
 const fileFilter = (req, file, callback) => {
     if (file.mimetype.startsWith("image/")) {
         callback(null, true);
@@ -16,11 +26,11 @@ const fileFilter = (req, file, callback) => {
     }
 };
 
-// Limit file size to 5MB
+// Limit 5MB
 const upload = multer({
     storage,
     fileFilter,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    limits: { fileSize: 5 * 1024 * 1024 },
 });
 
 export default upload;

@@ -10,6 +10,7 @@ import TopBanner from "./components/TopBanner";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Profile from "./pages/Profile";
 import ScrollToHashElement from "./utils/ScrollToHashElement";
+import { useScrollRestoration } from "./hooks/useScrollRestoration";
 
 // Lazy load all pages
 const Home = lazy(() => import("./pages/Home"));
@@ -31,13 +32,14 @@ const Soccer = lazy(() => import("./pages/Soccer"));
 const Corporate = lazy(() => import("./pages/Corporate"));
 
 const App = () => {
+    useScrollRestoration();
     return (
         <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
             <ToastContainer />
             <TopBanner />
             <Navbar />
             <SearchBar />
-            <ScrollToTop />
+
             {/* Suspense fallback with spinner + logo */}
             <Suspense fallback={<PageLoader />}>
                 <Routes>
