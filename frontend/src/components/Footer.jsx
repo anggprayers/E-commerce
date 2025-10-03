@@ -74,7 +74,7 @@ const Footer = () => {
             <div>
                 <hr className="border-white" />
                 <p className="py-5 text-sm text-center text-white">
-                    Copyright 2025 @ kukzsportswear.com - All Rights Reserved
+                    Copyright 2025 @<a href="https://kukzsportswear.com/">Kukz Sportswear</a> All Rights Reserved
                 </p>
             </div>
         </div>

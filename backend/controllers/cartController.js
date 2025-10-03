@@ -7,7 +7,9 @@ const addToCart = async (req, res) => {
 
         const userData = await userModel.findById(userId);
         if (!userData) {
-            return res.status(404).json({ success: false, message: "User not found" });
+            return res
+                .status(404)
+                .json({ success: false, message: "We couldn’t find your account. Please login again." });
         }
 
         let cartData = userData.cartData || {};
@@ -48,7 +50,7 @@ const updateCart = async (req, res) => {
 
         const userData = await userModel.findById(userId);
         if (!userData) {
-            return res.status(404).json({ success: false, message: "User not found" });
+            return res.status(404).json({ success: false, message: "Your session expired. Please login again." });
         }
 
         let cartData = userData.cartData || {};
@@ -79,7 +81,7 @@ const updateCart = async (req, res) => {
         res.json({ success: true, message: "Cart Updated" });
     } catch (error) {
         console.log(error);
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({ success: false, message: "Something went wrong. Please try again later." });
     }
 };
 

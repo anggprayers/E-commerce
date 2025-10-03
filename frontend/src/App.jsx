@@ -39,7 +39,7 @@ const App = () => {
             <TopBanner />
             <Navbar />
             <SearchBar />
-
+            <ScrollToTop />
             {/* Suspense fallback with spinner + logo */}
             <Suspense fallback={<PageLoader />}>
                 <Routes>

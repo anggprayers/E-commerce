@@ -93,9 +93,9 @@ const Profile = () => {
                             {/* Left side: profile image + name */}
                             <div className="flex items-center gap-4">
                                 <div>
-                                    <h1 className="text-3xl font-bold text-red-500 flex flex-wrap items-center gap-2">
+                                    <h1 className="text-3xl font-bold text-red-500 flex flex-wrap items-center gap-2 whitespace-wrap">
                                         <span>Welcome, {user.name}!</span>
-                                        <FaRegHandPaper className="text-red-500 animate-wiggle text-2xl sm:text-3xl" />
+                                        <FaRegHandPaper className="text-red-500 animate-wiggle text-2xl sm:text-3xl max-[450px]:hidden" />
                                     </h1>
                                     <p className="hidden text-gray-300 mt-2">Email: {user.email}</p>
                                 </div>
@@ -104,7 +104,7 @@ const Profile = () => {
                             {/* Right side: logout */}
                             <button
                                 onClick={handleLogout}
-                                className=" hidden px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition"
+                                className="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition"
                             >
                                 Logout
                             </button>

@@ -54,10 +54,19 @@ const Navbar = () => {
 
                 <div className="group relative z-40">
                     <img
-                        onClick={() => (token ? null : navigate("/login"))}
+                        onClick={() => {
+                            if (!token) {
+                                navigate("/login");
+                            } else {
+                                // detect small screens
+                                if (window.innerWidth <= 640) {
+                                    navigate("/my-profile");
+                                }
+                            }
+                        }}
                         src={assets.profile_icon}
                         className="w-6 cursor-pointer"
-                        alt=""
+                        alt="User"
                     />
                     {/* ---- Dropdown Menu ----- */}
                     {token && (

@@ -11,18 +11,11 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
 
-    const fetchUserCart = async () => {
+    const fetchUserCart = async (tkn) => {
         try {
-            const response = await axios.post(
-                backendUrl + "/api/cart/get",
-                {},
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
+            const response = await axios.post(backendUrl + "/api/cart/get", {}, { headers: { token: tkn } });
             if (response.data.success) {
                 setCartItems(response.data.cartData || {});
-            } else {
-                console.log(response.data.message);
             }
         } catch (error) {
             console.log(error);
@@ -41,8 +34,15 @@ const Login = () => {
                 if (response.data.success) {
                     setToken(response.data.token);
                     localStorage.setItem("token", response.data.token);
+                    toast.success("Account created successfully!", {
+                        closeOnClick: true,
+                        autoClose: 3000,
+                    });
                 } else {
-                    toast.error(response.data.message);
+                    toast.error(response.data.message || "Registration failed. Please try again.", {
+                        closeOnClick: true,
+                        autoClose: 3000,
+                    });
                 }
             } else {
                 const response = await axios.post(backendUrl + "/api/user/login", {
@@ -52,23 +52,51 @@ const Login = () => {
                 if (response.data.success) {
                     setToken(response.data.token);
                     localStorage.setItem("token", response.data.token);
-
-                    // Fetch and sync cart right after login/signup
                     await fetchUserCart(response.data.token);
+                    toast.success("Login successful!", {
+                        closeOnClick: true,
+                        autoClose: 3000,
+                    });
                 } else {
-                    toast.error(response.data.message);
+                    toast.error(response.data.message || "Invalid email or password.", {
+                        closeOnClick: true,
+                        autoClose: 3000,
+                    });
                 }
             }
         } catch (error) {
-            console.log(error.message);
+            console.error("Login/Register error:", error);
+
+            if (error.response) {
+                toast.error(error.response.data.message || "Something went wrong. Please try again.", {
+                    closeOnClick: true,
+                    autoClose: 3000,
+                });
+            } else if (error.request) {
+                toast.error("Server is not responding. Please check your internet connection.", {
+                    closeOnClick: true,
+                    autoClose: 3000,
+                });
+            } else {
+                toast.error("An unexpected error occurred. Please try again later.", {
+                    closeOnClick: true,
+                    autoClose: 3000,
+                });
+            }
         }
     };
 
     useEffect(() => {
         if (token) {
-            navigate("/");
+            // Add a short delay so user sees toast instead of footer flash
+            const redirectTimer = setTimeout(() => {
+                navigate("/");
+            }, 500);
+
+            return () => clearTimeout(redirectTimer);
         }
-    }, [token]);
+    }, [token, navigate]);
+
     return (
         <form
             onSubmit={onSubmitHandler}
@@ -78,9 +106,7 @@ const Login = () => {
                 <p className="prata-regular text-3xl">{currentState}</p>
                 <hr className="border-none h-[1.5px] w-8 bg-red-500" />
             </div>
-            {currentState === "Login" ? (
-                ""
-            ) : (
+            {currentState === "Login" ? null : (
                 <input
                     onChange={(e) => setName(e.target.value)}
                     value={name}
@@ -107,20 +133,18 @@ const Login = () => {
                 required
             />
             <div className="w-full flex justify-between text-sm mt-[-8px]">
-                <p className="cursor-pointer transition duration-300 ease-in-out hover:text-blue-600 hover:underline">
-                    Forgot password?
-                </p>
+                <p className="cursor-pointer hover:text-blue-600 hover:underline">Forgot password?</p>
                 {currentState === "Login" ? (
                     <p
                         onClick={() => setCurrentState("Sign Up")}
-                        className="cursor-pointer transition duration-300 ease-in-out hover:text-red-600 hover:underline"
+                        className="cursor-pointer hover:text-red-600 hover:underline"
                     >
                         Create an account
                     </p>
                 ) : (
                     <p
                         onClick={() => setCurrentState("Login")}
-                        className="cursor-pointer transition duration-300 ease-in-out hover:text-red-600 hover:underline"
+                        className="cursor-pointer hover:text-red-600 hover:underline"
                     >
                         Login Here
                     </p>

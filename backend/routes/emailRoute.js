@@ -1,6 +1,6 @@
 import express from "express";
 import { sendEmail } from "../controllers/emailController.js";
-import upload from "../middleware/multer.js";
+import upload from "../middleware/multerDisk.js";
 
 const emailRouter = express.Router();
 

@@ -1,26 +1,32 @@
 import { v2 as cloudinary } from "cloudinary";
 import productModel from "../models/productModel.js";
+import streamifier from "streamifier";
 
-// Function for add product
+// helper to upload from buffer
+const uploadToCloudinary = (fileBuffer) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({ resource_type: "image" }, (error, result) => {
+            if (result) resolve(result.secure_url);
+            else reject(error);
+        });
+        streamifier.createReadStream(fileBuffer).pipe(stream);
+    });
+};
+
+// ================== Add Product ==================
 const addProduct = async (req, res) => {
     try {
         const { name, description, price, sportsCategory, category, subCategory, sizes, bestseller } = req.body;
 
-        const image1 = req.files.image1 && req.files.image1[0];
-        const image2 = req.files.image2 && req.files.image2[0];
-        const image3 = req.files.image3 && req.files.image3[0];
-        const image4 = req.files.image4 && req.files.image4[0];
-
-        const images = [image1, image2, image3, image4].filter((item) => item !== undefined);
-
-        let imagesUrl = await Promise.all(
-            images.map(async (item) => {
-                let result = await cloudinary.uploader.upload(item.path, {
-                    resource_type: "image",
-                });
-                return result.secure_url;
-            })
-        );
+        // grab uploaded images
+        const images = [];
+        for (let i = 1; i <= 4; i++) {
+            if (req.files[`image${i}`]) {
+                const file = req.files[`image${i}`][0];
+                const url = await uploadToCloudinary(file.buffer);
+                images.push(url);
+            }
+        }
 
         const productData = {
             name,
@@ -29,9 +35,9 @@ const addProduct = async (req, res) => {
             category,
             price: Number(price),
             subCategory,
-            bestseller: bestseller === "true" ? true : false,
+            bestseller: bestseller === "true" || bestseller === true,
             sizes: JSON.parse(sizes),
-            image: imagesUrl,
+            image: images,
             date: Date.now(),
         };
 
@@ -44,7 +50,7 @@ const addProduct = async (req, res) => {
     }
 };
 
-// Function for list product
+// ================== List Products ==================
 const listProducts = async (req, res) => {
     try {
         const products = await productModel.find({});
@@ -54,7 +60,7 @@ const listProducts = async (req, res) => {
     }
 };
 
-// Function for removing product
+// ================== Remove Product ==================
 const removeProduct = async (req, res) => {
     try {
         await productModel.findByIdAndDelete(req.body.id);
@@ -64,7 +70,7 @@ const removeProduct = async (req, res) => {
     }
 };
 
-// Function for single product details
+// ================== Single Product ==================
 const singleProduct = async (req, res) => {
     try {
         const { productId } = req.body;
@@ -75,17 +81,14 @@ const singleProduct = async (req, res) => {
     }
 };
 
-// Function for updating product
+// ================== Update Product ==================
 const updateProduct = async (req, res) => {
     try {
         const { id, name, description, price, sportsCategory, category, subCategory, sizes, bestseller } = req.body;
 
         const product = await productModel.findById(id);
-        if (!product) {
-            return res.json({ success: false, message: "Product not found" });
-        }
+        if (!product) return res.json({ success: false, message: "Product not found" });
 
-        // update fields
         product.name = name;
         product.description = description;
         product.price = Number(price);
@@ -95,17 +98,15 @@ const updateProduct = async (req, res) => {
         product.bestseller = bestseller === "true" || bestseller === true;
         product.sizes = JSON.parse(sizes);
 
-        // handle new images if uploaded
+        // handle new uploads
         const images = [];
         for (let i = 1; i <= 4; i++) {
             if (req.files[`image${i}`]) {
-                const result = await cloudinary.uploader.upload(req.files[`image${i}`][0].path, {
-                    resource_type: "image",
-                });
-                images.push(result.secure_url);
+                const file = req.files[`image${i}`][0];
+                const url = await uploadToCloudinary(file.buffer);
+                images.push(url);
             } else if (product.image[i - 1]) {
-                // keep old image if no new one uploaded
-                images.push(product.image[i - 1]);
+                images.push(product.image[i - 1]); // keep old
             }
         }
         product.image = images;

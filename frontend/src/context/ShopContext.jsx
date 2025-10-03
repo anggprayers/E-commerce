@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 export const ShopContext = createContext();
 
@@ -16,6 +17,27 @@ const ShopContextProvider = (props) => {
     const [orders, setOrders] = useState([]);
     const [token, setToken] = useState(localStorage.getItem("token") || "");
     const navigate = useNavigate();
+
+    // Auto-logout if token expired
+    useEffect(() => {
+        if (token) {
+            try {
+                const decoded = jwtDecode(token);
+                if (decoded.exp * 1000 < Date.now()) {
+                    // expired
+                    toast.error("Session expired. Please login again.", { autoClose: 3000 });
+                    setToken("");
+                    localStorage.removeItem("token");
+                    navigate("/login");
+                }
+            } catch (err) {
+                console.error("Invalid token:", err);
+                setToken("");
+                localStorage.removeItem("token");
+                navigate("/login");
+            }
+        }
+    }, [token, navigate]);
 
     const addToCart = async (itemId, size, frontName = "", backName = "", jerseyNumber = "") => {
         if (!size) {
@@ -53,7 +75,7 @@ const ShopContextProvider = (props) => {
         toast.success("Added to cart! Click here to view.", {
             onClick: () => navigate("/cart"),
             closeOnClick: true,
-            autoClose: 5000,
+            autoClose: 3000,
         });
 
         // sync with backend if logged in
@@ -66,7 +88,7 @@ const ShopContextProvider = (props) => {
                 );
             } catch (error) {
                 console.log(error);
-                toast.error(error.message);
+                toast.error("Could not add item. Please try again.", { autoClose: 3000 });
             }
         }
     };
@@ -119,7 +141,6 @@ const ShopContextProvider = (props) => {
                 await axios.post(backendUrl + "/api/cart/update", { itemId, size, quantity }, { headers: { token } });
             } catch (error) {
                 console.log(error);
-                toast.error(error.message);
             }
         }
     };
@@ -134,7 +155,6 @@ const ShopContextProvider = (props) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.message);
         }
     };
 
@@ -146,7 +166,6 @@ const ShopContextProvider = (props) => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.message);
         }
     };
 

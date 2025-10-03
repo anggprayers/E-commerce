@@ -4,6 +4,7 @@ import Title from "../components/Title";
 import NewsLetterBox from "../components/NewsLetterBox";
 import { FaFolderOpen } from "react-icons/fa";
 import { ShopContext } from "../context/ShopContext";
+import { toast } from "react-toastify";
 
 const Contact = () => {
     const { backendUrl } = useContext(ShopContext);
@@ -16,8 +17,6 @@ const Contact = () => {
     });
 
     const [loading, setLoading] = useState(false);
-    const [successMsg, setSuccessMsg] = useState("");
-    const [errorMsg, setErrorMsg] = useState("");
     const [files, setFiles] = useState({ front: null, back: null, side: null });
 
     const handleChange = (e) => {
@@ -27,16 +26,12 @@ const Contact = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setSuccessMsg("");
-        setErrorMsg("");
 
         try {
             const data = new FormData();
             Object.entries(formData).forEach(([key, value]) => {
                 data.append(key, value);
             });
-
-            // Append each file if it exists
             if (files.front) data.append("frontDesign", files.front);
             if (files.back) data.append("backDesign", files.back);
             if (files.side) data.append("sideDesign", files.side);
@@ -46,18 +41,14 @@ const Contact = () => {
             });
 
             if (res.data.success) {
-                setSuccessMsg("Email sent successfully!");
+                toast.success(res.data.message || "Message sent!", { autoClose: 3000 });
                 setFormData({ name: "", contact: "", email: "", subject: "", message: "" });
-                setFiles({ front: null, back: null, side: null }); // reset all 3
-
-                setTimeout(() => setSuccessMsg(""), 5000);
+                setFiles({ front: null, back: null, side: null });
             } else {
-                setErrorMsg(res.data.error || "Failed to send email.");
-                setTimeout(() => setErrorMsg(""), 5000);
+                toast.error(res.data.error || "Failed to send message.", { autoClose: 5000 });
             }
         } catch (err) {
-            setErrorMsg(err.response?.data?.error || "Something went wrong.");
-            setTimeout(() => setErrorMsg(""), 5000);
+            toast.error(err.response?.data?.error || "Something went wrong.", { autoClose: 3000 });
         } finally {
             setLoading(false);
         }
@@ -102,12 +93,9 @@ const Contact = () => {
             <div className="flex justify-center mb-28 text-white">
                 <form id="contact-form" className="flex flex-col w-full md:w-1/2 gap-4 p-6" onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <h2 className="text-2xl font-bold text-white text-center">Get in touch</h2>
+                        <h2 className="text-2xl font-bold text-white text-center">Get in Touch</h2>
                         <hr className="border-t-2 border-red-500 mt-2 w-20 mx-auto" />
                     </div>
-
-                    {successMsg && <p className="text-green-500 text-center">{successMsg}</p>}
-                    {errorMsg && <p className="text-red-500 text-center">{errorMsg}</p>}
 
                     <input
                         type="text"

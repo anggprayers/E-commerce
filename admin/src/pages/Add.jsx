@@ -15,10 +15,19 @@ const Add = ({ token }) => {
     const [sportsCategory, setSportsCategory] = useState("Basketball");
     const [bestseller, setBestseller] = useState(false);
     const [sizes, setSizes] = useState([]);
+    const [loading, setLoading] = useState(false); // ✅ track submit state
 
     // actual submit logic
     const submitProduct = async () => {
         try {
+            // ✅ require at least 1 image
+            if (!images.some((img) => img !== null)) {
+                toast.error("Please upload at least 1 product image");
+                return;
+            }
+
+            setLoading(true); // disable button while uploading
+
             const formData = new FormData();
             formData.append("name", name);
             formData.append("description", description);
@@ -53,11 +62,20 @@ const Add = ({ token }) => {
         } catch (error) {
             console.log(error);
             toast.error(error.message);
+        } finally {
+            setLoading(false); // re-enable button
         }
     };
 
     const onSubmitHandler = (e) => {
         e.preventDefault();
+
+        // ✅ prevent confirmation if no image
+        if (!images.some((img) => img !== null)) {
+            toast.error("Please upload at least 1 product image");
+            return;
+        }
+
         toast(
             ({ closeToast }) => (
                 <div className="flex flex-col gap-2">
@@ -69,8 +87,9 @@ const Add = ({ token }) => {
                                 closeToast();
                             }}
                             className="px-2 py-1 bg-green-600 text-white rounded"
+                            disabled={loading} // ✅ avoid double submit
                         >
-                            Yes
+                            {loading ? "Adding..." : "Yes"}
                         </button>
                         <button onClick={closeToast} className="px-2 py-1 bg-gray-300 rounded">
                             No
@@ -135,7 +154,6 @@ const Add = ({ token }) => {
                     required
                 />
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 max-w-2xl">
                 <div>
                     <p className="mb-2">Sports Category</p>
@@ -183,7 +201,6 @@ const Add = ({ token }) => {
                         <option value="Unisex">Unisex</option>
                     </select>
                 </div>
-
                 <div>
                     <p className="mb-2">Product Price</p>
                     <input
@@ -195,131 +212,31 @@ const Add = ({ token }) => {
                     />
                 </div>
             </div>
+            {/* Product Sizes */}
             <div>
                 <p className="mb-2">Product Sizes</p>
-                <div className="flex gap-3">
-                    <div
-                        onClick={(e) =>
-                            setSizes((prev) =>
-                                prev.includes("S") ? prev.filter((item) => item !== "S") : [...prev, "S"]
-                            )
-                        }
-                    >
-                        <p
-                            className={`${
-                                sizes.includes("S") ? "bg-red-500 text-white" : "bg-slate-200 text-black"
-                            } px-3 py-1 cursor-pointer`}
+                <div className="flex gap-3 flex-wrap">
+                    {["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"].map((size) => (
+                        <div
+                            key={size}
+                            onClick={() =>
+                                setSizes((prev) =>
+                                    prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
+                                )
+                            }
                         >
-                            S
-                        </p>
-                    </div>
-                    <div
-                        onClick={(e) =>
-                            setSizes((prev) =>
-                                prev.includes("M") ? prev.filter((item) => item !== "M") : [...prev, "M"]
-                            )
-                        }
-                    >
-                        <p
-                            className={`${
-                                sizes.includes("M") ? "bg-red-500 text-white" : "bg-slate-200 text-black"
-                            } px-3 py-1 cursor-pointer`}
-                        >
-                            M
-                        </p>
-                    </div>
-                    <div
-                        onClick={(e) =>
-                            setSizes((prev) =>
-                                prev.includes("L") ? prev.filter((item) => item !== "L") : [...prev, "L"]
-                            )
-                        }
-                    >
-                        <p
-                            className={`${
-                                sizes.includes("L") ? "bg-red-500 text-white" : "bg-slate-200 text-black"
-                            } px-3 py-1 cursor-pointer`}
-                        >
-                            L
-                        </p>
-                    </div>
-                    <div
-                        onClick={(e) =>
-                            setSizes((prev) =>
-                                prev.includes("XL") ? prev.filter((item) => item !== "XL") : [...prev, "XL"]
-                            )
-                        }
-                    >
-                        <p
-                            className={`${
-                                sizes.includes("XL") ? "bg-red-500 text-white" : "bg-slate-200 text-black"
-                            } px-3 py-1 cursor-pointer`}
-                        >
-                            XL
-                        </p>
-                    </div>
-                    <div
-                        onClick={(e) =>
-                            setSizes((prev) =>
-                                prev.includes("2XL") ? prev.filter((item) => item !== "2XL") : [...prev, "2XL"]
-                            )
-                        }
-                    >
-                        <p
-                            className={`${
-                                sizes.includes("2XL") ? "bg-red-500 text-white" : "bg-slate-200 text-black"
-                            } px-3 py-1 cursor-pointer`}
-                        >
-                            2XL
-                        </p>
-                    </div>
-                    <div
-                        onClick={(e) =>
-                            setSizes((prev) =>
-                                prev.includes("3XL") ? prev.filter((item) => item !== "3XL") : [...prev, "3XL"]
-                            )
-                        }
-                    >
-                        <p
-                            className={`${
-                                sizes.includes("3XL") ? "bg-red-500 text-white" : "bg-slate-200 text-black"
-                            } px-3 py-1 cursor-pointer`}
-                        >
-                            3XL
-                        </p>
-                    </div>
-                    <div
-                        onClick={(e) =>
-                            setSizes((prev) =>
-                                prev.includes("4XL") ? prev.filter((item) => item !== "4XL") : [...prev, "4XL"]
-                            )
-                        }
-                    >
-                        <p
-                            className={`${
-                                sizes.includes("4XL") ? "bg-red-500 text-white" : "bg-slate-200 text-black"
-                            } px-3 py-1 cursor-pointer`}
-                        >
-                            4XL
-                        </p>
-                    </div>
-                    <div
-                        onClick={(e) =>
-                            setSizes((prev) =>
-                                prev.includes("5XL") ? prev.filter((item) => item !== "5XL") : [...prev, "5XL"]
-                            )
-                        }
-                    >
-                        <p
-                            className={`${
-                                sizes.includes("5XL") ? "bg-red-500 text-white" : "bg-slate-200 text-black"
-                            } px-3 py-1 cursor-pointer`}
-                        >
-                            5XL
-                        </p>
-                    </div>
+                            <p
+                                className={`${
+                                    sizes.includes(size) ? "bg-red-500 text-white" : "bg-slate-200 text-black"
+                                } px-3 py-1 cursor-pointer`}
+                            >
+                                {size}
+                            </p>
+                        </div>
+                    ))}
                 </div>
             </div>
+
             <div className="flex gap-2 mt-2">
                 <input
                     onChange={() => setBestseller((prev) => !prev)}
@@ -331,8 +248,12 @@ const Add = ({ token }) => {
                     Add to bestseller
                 </label>
             </div>
-            <button type="submit" className="w-28 py-3 mt-4 bg-black text-white active:bg-red-500 cursor-pointer">
-                ADD
+            <button
+                type="submit"
+                className="w-28 py-3 mt-4 bg-black text-white active:bg-red-500 cursor-pointer"
+                disabled={loading} // ✅ prevent multiple clicks
+            >
+                {loading ? "Adding..." : "ADD"}
             </button>
         </form>
     );
