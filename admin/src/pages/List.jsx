@@ -182,7 +182,11 @@ const List = ({ token }) => {
                 {currentItems.length > 0 ? (
                     currentItems.map((item) => (
                         <div key={item._id} className="border rounded-lg p-3 flex flex-col gap-2 bg-white shadow-sm">
-                            <img src={item.image[0]} alt={item.name} className="w-full h-full object-cover rounded" />
+                            <img
+                                src={item.image[0]}
+                                alt={item.name}
+                                className="w-full aspect-[4/3] overflow-hidden rounded"
+                            />
                             <div className="flex flex-col gap-1">
                                 <p className="font-medium truncate text-red-600">{item.name}</p>
                                 <p className="text-sm text-gray-500">{item.sportsCategory}</p>
