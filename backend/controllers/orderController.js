@@ -1,204 +1,162 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
-import axios from "axios";
+import { v2 as cloudinary } from "cloudinary";
 
-const origin = process.env.FRONTEND_URL || "http://localhost:5173";
-
-// Paymongo request with auth header
-const paymongo = axios.create({
-    baseURL: "https://api.paymongo.com/v1",
-    headers: {
-        Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY).toString("base64")}`,
-        "Content-Type": "application/json",
-    },
-});
-
-// Placing order using COD Payment
-const placeOrder = async (req, res) => {
+// PLACE ORDER (GCash, UnionBank, etc.)
+export const placeOrder = async (req, res) => {
     try {
-        const { userId, items, amount, address } = req.body;
+        const userId = req.userId;
+        const file = req.file;
+        let { items, amount, address, paymentMethod } = req.body;
 
-        const orderData = {
-            userId,
-            items,
-            address,
-            amount,
-            paymentMethod: "COD",
-            payment: false,
-            date: Date.now(),
-        };
+        // Parse JSON strings (multer sends text fields as strings)
+        if (typeof items === "string") items = JSON.parse(items);
+        if (typeof address === "string") address = JSON.parse(address);
 
-        const newOrder = new orderModel(orderData);
-        await newOrder.save();
+        // Recalculate fallback total amount
+        if (!amount && items?.length) {
+            amount = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+        }
 
-        await userModel.findByIdAndUpdate(userId, { cartData: {} });
+        if (!file) {
+            return res.status(400).json({ success: false, message: "Receipt image is required." });
+        }
 
-        res.json({ success: true, message: "Order Placed Successfully" });
+        // Upload receipt to Cloudinary
+        const uploadStream = cloudinary.uploader.upload_stream({ folder: "receipts" }, async (error, result) => {
+            if (error) {
+                console.error("Cloudinary upload error:", error);
+                return res.status(500).json({ success: false, message: "Failed to upload receipt. Please try again." });
+            }
+
+            // ✅ Create new order document
+            const newOrder = new orderModel({
+                userId,
+                items,
+                address,
+                amount,
+                paymentMethod,
+                receiptUrl: result.secure_url,
+                payment: false, // default unverified
+                status: "Pending Verification", // first stage
+                date: Date.now(),
+            });
+
+            await newOrder.save();
+
+            // ✅ Clear user’s cart after successful order
+            await userModel.findByIdAndUpdate(userId, { cartData: {} });
+
+            res.json({
+                success: true,
+                message: "Order placed successfully! Waiting for admin verification.",
+            });
+        });
+
+        uploadStream.end(file.buffer);
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: error.message });
+        console.error("Order placement error:", error);
+        res.status(500).json({ success: false, message: "Failed to place order. Please try again." });
     }
 };
 
-// Placing order using Gcash Payment
-const placeOrderGcash = async (req, res) => {
+// ADMIN: VIEW ALL ORDERS
+export const allOrders = async (req, res) => {
     try {
-        const { userId, items, amount, address } = req.body;
-
-        let formattedPhone = address.phone;
-        if (formattedPhone.startsWith("0")) {
-            formattedPhone = "+63" + formattedPhone.substring(1);
-        }
-
-        // 1. Create Payment Intent
-        const intentRes = await paymongo.post("/payment_intents", {
-            data: {
-                attributes: {
-                    amount: amount * 100, // centavos
-                    payment_method_allowed: ["gcash"],
-                    currency: "PHP",
-                },
-            },
-        });
-
-        const intent = intentRes.data.data;
-        const clientKey = intent.attributes.client_key;
-        const intentId = intent.id;
-
-        // 2. Create Payment Method (GCash)
-        const pmRes = await paymongo.post("/payment_methods", {
-            data: {
-                attributes: {
-                    type: "gcash",
-                    billing: {
-                        name: `${address.firstName} ${address.lastName}`,
-                        email: address.email,
-                        phone: formattedPhone,
-                    },
-                    redirect: {
-                        return_url: `${origin}/verify`,
-                    },
-                },
-            },
-        });
-
-        const paymentMethodId = pmRes.data.data.id;
-
-        // 3. Attach Payment Method to Intent
-        const attachRes = await paymongo.post(`/payment_intents/${intentId}/attach`, {
-            data: {
-                attributes: {
-                    payment_method: paymentMethodId,
-                    client_key: clientKey,
-                    return_url: `${origin}/verify`,
-                },
-            },
-        });
-
-        const checkoutUrl = attachRes.data.data.attributes.next_action.redirect.url;
-
-        // Save order with intentId
-        const newOrder = new orderModel({
-            userId,
-            items,
-            address,
-            amount,
-            paymentMethod: "Gcash",
-            payment: false,
-            date: Date.now(),
-            intentId,
-        });
-        await newOrder.save();
-
-        res.json({ success: true, checkoutUrl });
-    } catch (error) {
-        console.log("GCash Payment Error", error.response?.data || error.message);
-        res.json({
-            success: false,
-            message: error.response?.data?.errors?.[0]?.detail || error.message,
-        });
-    }
-};
-
-// Verify payment intent status (secure POST)
-const verifyPayment = async (req, res) => {
-    try {
-        const { payment_intent_id: intentId } = req.body;
-
-        if (!intentId) {
-            return res.json({ success: false, paid: false, message: "Missing payment_intent_id" });
-        }
-
-        // Call PayMongo to check latest intent status
-        const intentRes = await paymongo.get(`/payment_intents/${intentId}`);
-        const intent = intentRes.data.data;
-        const status = intent.attributes.status;
-
-        if (status === "succeeded") {
-            // update only payment = true
-            await orderModel.findOneAndUpdate({ intentId }, { $set: { payment: true } }, { new: true });
-
-            return res.json({ success: true, paid: true, status });
-        } else {
-            return res.json({ success: true, paid: false, status });
-        }
-    } catch (error) {
-        console.error("Verify Error:", error.response?.data || error.message);
-        res.json({
-            success: false,
-            paid: false,
-            message: error.response?.data?.errors?.[0]?.detail || error.message,
-        });
-    }
-};
-
-// All Orders Data for Admin Panel
-const allOrders = async (req, res) => {
-    try {
-        const orders = await orderModel.find({});
+        const orders = await orderModel.find({}).sort({ date: -1 });
         res.json({ success: true, orders });
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: error.message });
+        console.error("Fetch Orders Error:", error);
+        res.status(500).json({ success: false, message: "Unable to fetch orders." });
     }
 };
 
-// User Order Data for Frontend
-const userOrders = async (req, res) => {
+// USER: VIEW THEIR ORDERS
+export const userOrders = async (req, res) => {
     try {
         const { userId } = req.body;
-
-        const orders = await orderModel.find({ userId });
+        const orders = await orderModel.find({ userId }).sort({ date: -1 });
         res.json({ success: true, orders });
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: error.message });
+        console.error("User Orders Error:", error);
+        res.status(500).json({ success: false, message: "Unable to load your orders." });
     }
 };
 
-// Update Order Status from Admin Panel
-const updateStatus = async (req, res) => {
+// ADMIN: UPDATE ORDER STATUS (restricted if not verified)
+export const updateStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;
+        const order = await orderModel.findById(orderId);
+
+        if (!order) return res.status(404).json({ success: false, message: "Order not found." });
+        if (!order.payment) {
+            return res.status(403).json({ success: false, message: "Cannot update status until payment is verified." });
+        }
 
         await orderModel.findByIdAndUpdate(orderId, { status });
-        res.json({ success: true, message: "Order Status Updated" });
+        res.json({ success: true, message: "Order status updated successfully." });
     } catch (error) {
-        console.log(error);
-        res.json({ success: false, message: error.message });
+        console.error("Update Status Error:", error);
+        res.status(500).json({ success: false, message: "Failed to update status." });
     }
 };
 
-// Get orders for the logged-in user
-const getUserOrders = async (req, res) => {
+// ADMIN: VERIFY / UNVERIFY PAYMENT
+export const verifyPayment = async (req, res) => {
     try {
-        const orders = await orderModel.find({ userId: req.body.userId }).sort({ date: -1 });
+        const { orderId, adminPass } = req.body;
+        const order = await orderModel.findById(orderId);
 
-        res.json({ success: true, orders });
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found." });
+        }
+
+        // ✅ Hardcoded admin password check
+        const ADMIN_PASSWORD = "kukz@sportswear";
+
+        if (adminPass !== ADMIN_PASSWORD) {
+            return res.status(403).json({ success: false, message: "Incorrect admin password." });
+        }
+
+        // ✅ Toggle payment verification
+        order.payment = !order.payment;
+
+        // ✅ Update order status accordingly
+        if (order.payment) {
+            order.status = "To Ship"; // automatically go to shipping queue
+        } else {
+            order.status = "Pending Verification"; // if unverified again
+        }
+
+        await order.save();
+
+        return res.json({
+            success: true,
+            message: order.payment
+                ? "Payment verified successfully. Order moved to 'To Ship'."
+                : "Payment unverified. Order returned to 'Pending Verification'.",
+        });
     } catch (error) {
-        console.error(error);
-        res.json({ success: false, message: error.message });
+        console.error("Verify Payment Error:", error);
+        return res.status(500).json({ success: false, message: "Failed to verify payment. Please try again." });
     }
 };
 
-export { placeOrder, placeOrderGcash, allOrders, userOrders, updateStatus, verifyPayment, getUserOrders };
+// ADMIN: REMOVE ORDER
+export const removeOrder = async (req, res) => {
+    try {
+        const { id } = req.body;
+        const order = await orderModel.findById(id);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found." });
+        }
+
+        await orderModel.findByIdAndDelete(id);
+        res.json({ success: true, message: "Order deleted successfully." });
+    } catch (error) {
+        console.error("Delete Order Error:", error);
+        res.status(500).json({ success: false, message: "Failed to delete order." });
+    }
+};

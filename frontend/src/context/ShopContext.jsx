@@ -25,7 +25,7 @@ const ShopContextProvider = (props) => {
                 const decoded = jwtDecode(token);
                 if (decoded.exp * 1000 < Date.now()) {
                     // expired
-                    toast.error("Session expired. Please login again.", { autoClose: 3000 });
+                    toast.error("Please login again.", { autoClose: 3000 });
                     setToken("");
                     localStorage.removeItem("token");
                     navigate("/login");
@@ -41,7 +41,16 @@ const ShopContextProvider = (props) => {
 
     const addToCart = async (itemId, size, frontName = "", backName = "", jerseyNumber = "") => {
         if (!size) {
-            toast.error("Please select size");
+            toast.error("Please select a size.", { autoClose: 3000 });
+            return;
+        }
+
+        // If not logged in
+        if (!token) {
+            toast.error("Please log in to add items to your cart.", { autoClose: 3000 });
+            setTimeout(() => {
+                navigate("/login");
+            }, 3000); // Redirect after toast closes
             return;
         }
 
@@ -71,25 +80,23 @@ const ShopContextProvider = (props) => {
             return newCart;
         });
 
-        // toast popup
+        // Toast success
         toast.success("Added to cart! Click here to view.", {
             onClick: () => navigate("/cart"),
             closeOnClick: true,
             autoClose: 3000,
         });
 
-        // sync with backend if logged in
-        if (token) {
-            try {
-                await axios.post(
-                    backendUrl + "/api/cart/add",
-                    { itemId, size, frontName, backName, jerseyNumber },
-                    { headers: { token } }
-                );
-            } catch (error) {
-                console.log(error);
-                toast.error("Could not add item. Please try again.", { autoClose: 3000 });
-            }
+        // Sync with backend
+        try {
+            await axios.post(
+                `${backendUrl}/api/cart/add`,
+                { itemId, size, frontName, backName, jerseyNumber },
+                { headers: { token } }
+            );
+        } catch (error) {
+            console.error(error);
+            toast.error("Could not add item. Please try again later.", { autoClose: 3000 });
         }
     };
 

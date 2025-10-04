@@ -11,7 +11,6 @@ const orderSchema = new mongoose.Schema({
             price: Number,
             image: Array,
 
-            // Custom fields (per order item, optional)
             frontName: { type: String, default: "" },
             backName: { type: String, default: "" },
             jerseyNumber: { type: String, default: "" },
@@ -19,11 +18,11 @@ const orderSchema = new mongoose.Schema({
     ],
     amount: { type: Number, required: true },
     address: { type: Object, required: true },
-    status: { type: String, required: true, default: "Order Placed" },
-    paymentMethod: { type: String, required: true },
-    payment: { type: Boolean, required: true, default: false },
+    receiptUrl: { type: String, required: true },
+    status: { type: String, default: "Pending Verification" },
+    paymentMethod: { type: String, required: true }, // GCash / UnionBank
+    payment: { type: Boolean, default: false }, // Will only be true after admin verifies
     date: { type: Number, required: true },
-    intentId: { type: String },
 });
 
 const orderModel = mongoose.models.order || mongoose.model("order", orderSchema);

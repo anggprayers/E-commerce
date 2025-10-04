@@ -103,7 +103,6 @@ const Cart = () => {
                                 onClick={() =>
                                     confirmToast("Remove this item from your cart?", () => {
                                         updateQuantity(item._id, item.size, 0);
-                                        toast.info("Item removed from your cart.", { autoClose: 3000 });
                                     })
                                 }
                                 className="w-4 sm:w-5 cursor-pointer mx-auto"

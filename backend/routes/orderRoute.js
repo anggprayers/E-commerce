@@ -1,35 +1,33 @@
 import express from "express";
 import {
-    placeOrderGcash,
+    placeOrder,
     allOrders,
     userOrders,
     updateStatus,
-    placeOrder,
     verifyPayment,
-    getUserOrders,
+    removeOrder,
 } from "../controllers/orderController.js";
 import adminAuth from "../middleware/adminAuth.js";
 import authUser from "../middleware/auth.js";
+import authUserForm from "../middleware/authForm.js"; // new middleware
+import uploadReceipt from "../middleware/multerReceipt.js";
 
 const orderRouter = express.Router();
 
-// Admin Features
+// Admin routes
 orderRouter.post("/list", adminAuth, allOrders);
 orderRouter.post("/status", adminAuth, updateStatus);
 
-// COD Payment Feature
-orderRouter.post("/place", authUser, placeOrder);
+// Place order
+orderRouter.post("/place", authUserForm, uploadReceipt, placeOrder);
 
-// Gcash Payment Feature
-orderRouter.post("/gcash", authUser, placeOrderGcash);
+// Verify payment
+orderRouter.post("/payment", authUser, verifyPayment);
 
-// User Feature
+// User orders
 orderRouter.post("/userorders", authUser, userOrders);
 
-// Verify Payment Intent Status
-orderRouter.post("/verify", verifyPayment);
-
-// Existing order
-orderRouter.post("/user", authUser, getUserOrders);
+// Remove/Delete orders
+orderRouter.post("/remove", adminAuth, removeOrder);
 
 export default orderRouter;

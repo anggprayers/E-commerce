@@ -28,7 +28,7 @@ const Product = () => {
     }, [productId, products]);
 
     return productData ? (
-        <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
+        <div className="border-t pt-10 transition-opacity ease-in duration-500 opacity-100 border-white">
             {/* Top-level: mobile = column (order controls), lg = grid (2 cols x 2 rows) */}
             <div className="flex flex-col lg:grid lg:grid-cols-2 lg:grid-rows-2 gap-12">
                 {/* ---------- Images (mobile order-1, grid: row1 col1) ---------- */}

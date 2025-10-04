@@ -38,7 +38,7 @@ const Profile = () => {
     const fetchUserOrders = async () => {
         try {
             const res = await axios.post(
-                `${backendUrl}/api/order/user`,
+                `${backendUrl}/api/order/userorders`,
                 {},
                 {
                     headers: { Authorization: `Bearer ${token}` },

@@ -3,6 +3,7 @@ import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import Pagination from "../components/Pagination";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 
 const ProductItem = lazy(() => import("../components/ProductItem"));
 
@@ -10,6 +11,8 @@ const Collection = () => {
     const { products, search, showSearch } = useContext(ShopContext);
     const [showFilter, setShowFilter] = useState(false);
     const [filterProducts, setFilterProducts] = useState([]);
+
+    const location = useLocation();
 
     // --- Persisted States ---
     const [sortType, setSortType] = useState(() => {
@@ -48,6 +51,15 @@ const Collection = () => {
             setSubCategory((prev) => [...prev, e.target.value]);
         }
     };
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const cat = params.get("category");
+        if (cat) {
+            setCategory([cat]);
+            sessionStorage.setItem("collectionCategory", JSON.stringify([cat]));
+        }
+    }, [location.search]);
 
     // --- Persist to sessionStorage ---
     useEffect(() => {

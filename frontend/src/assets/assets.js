@@ -11,6 +11,8 @@ import arrow_right from "./right-arrow-angle.png";
 import close_icon from "./close.png";
 import star_icon from "./star.png";
 import bin_icon from "./bin.png";
+import ub_qr from "./ub_qr.png";
+import gcash_qr from "./gcash_qr.png";
 
 export const assets = {
     // Icons
@@ -26,6 +28,8 @@ export const assets = {
     close_icon,
     star_icon,
     bin_icon,
+    ub_qr,
+    gcash_qr,
 
     // Cloudinary images
     logo1: "https://res.cloudinary.com/djbam8qrz/image/upload/v1759135112/kukz_logo_white_swhgw6.png",
@@ -43,4 +47,5 @@ export const assets = {
     kukz_boss: "https://res.cloudinary.com/djbam8qrz/image/upload/v1759135104/kukz_boss_dochei.png",
     about_logo: "https://res.cloudinary.com/djbam8qrz/image/upload/v1759135088/about_logo_oeoepe.png",
     collection_banner: "https://res.cloudinary.com/djbam8qrz/image/upload/v1759146680/collection_banner_tchnka.png",
+    unionbank_logo: "https://res.cloudinary.com/djbam8qrz/image/upload/v1759479791/unionbank_logo_l8beng.png",
 };

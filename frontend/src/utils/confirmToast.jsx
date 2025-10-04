@@ -8,8 +8,10 @@ export const confirmToast = (message, onConfirm) => {
                 <div className="flex gap-2">
                     <button
                         onClick={() => {
-                            onConfirm();
-                            closeToast();
+                            onConfirm(); // run delete
+                            closeToast(); // close confirm
+                            // show success toast separately
+                            toast.info("Item removed from your cart.", { autoClose: 3000 });
                         }}
                         className="px-2 py-1 bg-red-500 text-white rounded"
                     >

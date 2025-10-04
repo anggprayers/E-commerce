@@ -34,65 +34,68 @@ const Corporate = lazy(() => import("./pages/Corporate"));
 const App = () => {
     useScrollRestoration();
     return (
-        <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
+        <>
             <ToastContainer />
             <TopBanner />
-            <Navbar />
+
             <SearchBar />
             <ScrollToTop />
-            {/* Suspense fallback with spinner + logo */}
-            <Suspense fallback={<PageLoader />}>
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/customize-jersey" element={<div>Customize Jersey Page</div>} />
-                    <Route path="/collection" element={<Collection />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/product/:productId" element={<Product />} />
-                    {/* <Route path="/cart" element={<Cart />} /> */}
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/my-profile" element={<Profile />} />
-                    {/* <Route path="/place-order" element={<PlaceOrder />} /> */}
-                    {/* <Route path="/orders" element={<Orders />} /> */}
-                    <Route path="/verify" element={<Verify />} />
-                    <Route path="/billiards" element={<Billiards />} />
-                    <Route path="/mens-basketball" element={<Basketball />} />
-                    <Route path="/volleyball" element={<Volleyball />} />
-                    <Route path="/activewear" element={<Activewear />} />
-                    <Route path="/football" element={<Football />} />
-                    <Route path="/soccer" element={<Soccer />} />
-                    <Route path="/corporate" element={<Corporate />} />
+            <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
+                <Navbar />
+                {/* Suspense fallback with spinner + logo */}
+                <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/customize-jersey" element={<div>Customize Jersey Page</div>} />
+                        <Route path="/collection" element={<Collection />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/contact" element={<Contact />} />
+                        <Route path="/product/:productId" element={<Product />} />
+                        {/* <Route path="/cart" element={<Cart />} /> */}
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/my-profile" element={<Profile />} />
+                        {/* <Route path="/place-order" element={<PlaceOrder />} /> */}
+                        {/* <Route path="/orders" element={<Orders />} /> */}
+                        <Route path="/verify" element={<Verify />} />
+                        <Route path="/billiards" element={<Billiards />} />
+                        <Route path="/mens-basketball" element={<Basketball />} />
+                        <Route path="/volleyball" element={<Volleyball />} />
+                        <Route path="/activewear" element={<Activewear />} />
+                        <Route path="/football" element={<Football />} />
+                        <Route path="/soccer" element={<Soccer />} />
+                        <Route path="/corporate" element={<Corporate />} />
 
-                    {/* Protected routes */}
-                    <Route
-                        path="/cart"
-                        element={
-                            <ProtectedRoute>
-                                <Cart />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/place-order"
-                        element={
-                            <ProtectedRoute>
-                                <PlaceOrder />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/orders"
-                        element={
-                            <ProtectedRoute>
-                                <Orders />
-                            </ProtectedRoute>
-                        }
-                    />
-                </Routes>
-                <ScrollToHashElement />
-            </Suspense>
+                        {/* Protected routes */}
+                        <Route
+                            path="/cart"
+                            element={
+                                <ProtectedRoute>
+                                    <Cart />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/place-order"
+                            element={
+                                <ProtectedRoute>
+                                    <PlaceOrder />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/orders"
+                            element={
+                                <ProtectedRoute>
+                                    <Orders />
+                                </ProtectedRoute>
+                            }
+                        />
+                    </Routes>
+                    <ScrollToHashElement />
+                </Suspense>
+            </div>
             <Footer />
-        </div>
+        </>
     );
 };
 
